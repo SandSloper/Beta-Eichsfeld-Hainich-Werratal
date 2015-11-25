@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Naturpark_Hainich.iml" filepath="$PROJECT_DIR$/Naturpark_Hainich.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/osmdroid-android/osmdroid-android.iml" filepath="$PROJECT_DIR$/osmdroid-android/osmdroid-android.iml" />
     </modules>
   </component>
 </project>

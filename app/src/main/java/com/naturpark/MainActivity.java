@@ -2,7 +2,6 @@ package com.naturpark;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -30,14 +29,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         MapView map = (MapView) findViewById(R.id.mapview);
-        map.setTileSource(TileSourceFactory.MAPQUESTOSM);
 
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
 
+        map.setTileSource(TileSourceFactory.MAPQUESTOSM);
+
         IMapController mapController = map.getController();
-        mapController.setZoom(9);
-        GeoPoint startPoint = new GeoPoint(51.080414, 10.434239);
+        mapController.setZoom(15);
+       GeoPoint startPoint = new GeoPoint(51.080414, 10.434239);
         mapController.setCenter(startPoint);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
