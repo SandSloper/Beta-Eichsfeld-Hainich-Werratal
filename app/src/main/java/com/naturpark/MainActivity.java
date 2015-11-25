@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         GeoPoint startPoint = new GeoPoint(51.080414, 10.434239);
         mapController.setCenter(startPoint);
         map.setMultiTouchControls(true);
+        map.setUseDataConnection(true);
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
