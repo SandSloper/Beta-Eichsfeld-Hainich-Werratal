@@ -1,5 +1,6 @@
 package com.naturpark;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -9,19 +10,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.location.LocationManager;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
+import com.naturpark.GpsListener;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
+    private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
 
     //Defining Variables
     private Toolbar toolbar;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
+
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +37,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         MapView map = (MapView) findViewById(R.id.mapview);
-
-        map.setBuiltInZoomControls(true);
-        map.setMultiTouchControls(true);
-
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
-
-        IMapController mapController = map.getController();
-        mapController.setZoom(15);
-       GeoPoint startPoint = new GeoPoint(51.080414, 10.434239);
-        mapController.setCenter(startPoint);
+        map.getController().setZoom(15);
+        map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
+        map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
 
@@ -47,9 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         //Initializing NavigationView
-        navigationView = (NavigationView)
-
-                findViewById(R.id.navigation_view);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
         //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener()
@@ -79,13 +79,16 @@ public class MainActivity extends AppCompatActivity {
                                                                  }
                                                              }
                                                          }
-
         );
 
-        // Initializing Drawer Layout and ActionBarToggle
-        drawerLayout = (DrawerLayout)
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-                findViewById(R.id.drawer);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                MINIMUM_TIME_BETWEEN_UPDATES, MINIMUM_DISTANCE_CHANGE_FOR_UPDATES, new GpsListener(this));
+
+
+        // Initializing Drawer Layout and ActionBarToggle
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer) {
 
