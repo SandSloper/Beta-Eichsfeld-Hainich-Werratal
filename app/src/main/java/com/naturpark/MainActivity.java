@@ -1,6 +1,7 @@
 package com.naturpark;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -16,8 +17,18 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.naturpark.DbManager;
 import com.naturpark.GpsListener;
+
+import com.naturpark.data.Route;
+import com.naturpark.data.Obstacle;
+import com.naturpark.data.Poi;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
 
+    private List<Route> _list_route;
+    private List<Poi> _list_poi;
+    private List<Obstacle> _list_obstacle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         MapView map = (MapView) findViewById(R.id.mapview);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
         map.getController().setZoom(15);
-        map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
+        //map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
+        map.getController().setCenter(new GeoPoint(51.05446, 13.73636));
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
@@ -73,6 +89,10 @@ public class MainActivity extends AppCompatActivity {
                                                                        // fehlt noch.....
                                                                          return true;
 
+                                                                     case R.id.list_route:
+                                                                         startListRouteActivity();
+                                                                         return true;
+
                                                                      default:
                                                                          // fehlt noch.....
                                                                          return true;
@@ -86,6 +106,32 @@ public class MainActivity extends AppCompatActivity {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 MINIMUM_TIME_BETWEEN_UPDATES, MINIMUM_DISTANCE_CHANGE_FOR_UPDATES, new GpsListener(this));
 
+        DbManager dbManager = new DbManager(this);
+        _list_route = dbManager.queryRouteList();
+        _list_poi = dbManager.queryPoiList();
+        _list_obstacle = dbManager.queryObstacleList();
+        System.out.println("num route:" + _list_route.size());
+        System.out.println("num_poi:" + _list_poi.size());
+        System.out.println("num_obstacle:" + _list_obstacle.size());
+        for (int i = 0; i < _list_poi.size(); ++i)
+        {
+            Poi poi = _list_poi.get(i);
+            System.out.println(poi.type() +":"+poi.location().getLatitude() +":"+ poi.location().getLongitude() +":" + poi.name() +":"+ poi.address());
+        }
+
+        OverlayItem item1 = new OverlayItem("Palais im Großen Garten", "Dresden", new GeoPoint(51.03785, 13.76288));
+        item1.setMarker(getResources().getDrawable(R.drawable.marker_default, getBaseContext().getTheme()));
+        OverlayItem item2 = new OverlayItem("Frauenkirche", "Dresden", new GeoPoint(51.05173, 13.74117));
+        item2.setMarker(getResources().getDrawable(R.drawable.marker_default, getBaseContext().getTheme()));
+
+        ArrayList overlayItemArray = new ArrayList<OverlayItem>();
+        overlayItemArray.add(item1);
+        overlayItemArray.add(item1);
+
+        ItemizedIconOverlay<OverlayItem> itemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(this, overlayItemArray, null);
+
+        // Add the overlay to the MapView
+        map.getOverlays().add(itemizedIconOverlay);
 
         // Initializing Drawer Layout and ActionBarToggle
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
@@ -112,4 +158,18 @@ public class MainActivity extends AppCompatActivity {
         //calling sync state is necessay or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
     }
+
+    public void startListRouteActivity() {
+
+        Intent intent = new Intent(this, RouteListActivity.class);
+        startActivity(intent);
+    }
+
+    /*
+    public void startListPoiActivity() {
+
+        Intent intent = new Intent(this, PoiListActivity.class);
+        startActivity(intent);
+    }
+    */
 }

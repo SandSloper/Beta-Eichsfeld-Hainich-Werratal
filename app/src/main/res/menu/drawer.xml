@@ -9,5 +9,11 @@
             android:icon="@drawable/ic_one"
             android:title="Startseite" />
 
+        <item
+            android:id="@+id/list_route"
+            android:checked="false"
+            android:icon="@drawable/ic_one"
+            android:title="Routen" />
+
     </group>
 </menu>
