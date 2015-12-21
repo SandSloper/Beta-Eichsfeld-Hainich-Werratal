@@ -31,7 +31,7 @@ public class DbManager extends SQLiteOpenHelper {
     private static String DB_PATH;
     private static String DB_PATH_PREFIX = "/data/data/";
     private static String DB_PATH_SUFFIX = "/databases/";
-    private static String DB_NAME = "naturpark.db";
+    private static String DB_NAME = "naturparke.db";
 
     private SQLiteDatabase _database;
 
@@ -78,14 +78,15 @@ public class DbManager extends SQLiteOpenHelper {
         List<Route> list_route = new ArrayList<Route>();
 
         try {
-            Cursor cursor = _database.rawQuery("SELECT id, name FROM Route;", null);
+            Cursor cursor = _database.rawQuery("SELECT id, name, classification FROM Route;", null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
                 int id = cursor.getInt(cursor.getColumnIndex("id"));
                 String name = cursor.getString(cursor.getColumnIndex("name"));
+                int classification = cursor.getInt(cursor.getColumnIndex("classification"));
 
-                list_route.add(new Route(id, name));
+                list_route.add(new Route(id, name, classification));
                 cursor.moveToNext();
             }
         }

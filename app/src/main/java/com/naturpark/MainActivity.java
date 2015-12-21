@@ -1,24 +1,40 @@
 package com.naturpark;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.location.LocationManager;
 
+import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.bonuspack.overlays.Polyline;
+
+import org.osmdroid.views.overlay.PathOverlay;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +47,101 @@ import com.naturpark.data.Obstacle;
 import com.naturpark.data.Poi;
 
 public class MainActivity extends AppCompatActivity {
+
+    public PathOverlay parseGpxFile(Context context, String filename) {
+
+        PathOverlay pathOverlay = new PathOverlay(Color.BLUE, context);
+
+        try {
+            XmlPullParserFactory parserCreator = XmlPullParserFactory.newInstance();
+            XmlPullParser parser = parserCreator.newPullParser();
+
+            parser.setInput(context.getAssets().open(filename), null);
+
+            int parserEvent = parser.getEventType();
+            while (parserEvent != XmlPullParser.END_DOCUMENT) {
+
+                switch (parserEvent) {
+
+                    case XmlPullParser.START_TAG:
+                        String tag = parser.getName();
+
+                        /*
+                        if (tag.compareTo("number") == 0) {
+                            int numberRoutePoints = Integer.parseInt(parser.getAttributeValue(null, "numpoints"));
+                            int totalWaypoints = Integer.parseInt(parser.getAttributeValue(null, "numwpts"));
+                            Log.i("", "   Total points = " + numberRoutePoints + " Total waypoints = " + totalWaypoints);
+                        }
+                        */
+
+                        if (tag.compareTo("trkpt") == 0) {
+                            double lat = Double.parseDouble(parser.getAttributeValue(null, "lat"));
+                            double lon = Double.parseDouble(parser.getAttributeValue(null, "lon"));
+                            pathOverlay.addPoint(new GeoPoint(lat, lon));
+
+                            Log.i("", "   trackpoint= latitude=" + lat + " longitude=" + lon);
+
+                        } else if (tag.compareTo("wpt") == 0) {
+                            double lat = Double.parseDouble(parser.getAttributeValue(null, "lat"));
+                            double lon = Double.parseDouble(parser.getAttributeValue(null, "lon"));
+                            String description = parser.getAttributeValue(null, "description");
+                            Log.i("", "   waypoint=" + " latitude=" + lat + " longitude=" + lon + " " + description);
+                        }
+                        break;
+                }
+
+                parserEvent = parser.next();
+            }
+
+        } catch (Exception e) {
+            Log.i("RouteLoader", "Failed in parsing XML", e);
+        }
+
+
+        return pathOverlay;
+    }
+
+
+
+    public class ResourceProxyImpl extends DefaultResourceProxyImpl {
+
+        private final Context mContext;
+
+        public ResourceProxyImpl(final Context pContext) {
+            super(pContext);
+            mContext = pContext;
+        }
+
+        @Override
+        public String getString(final string pResId) {
+            try {
+                final int res = R.string.class.getDeclaredField(pResId.name()).getInt(null);
+                return mContext.getString(res);
+            } catch (final Exception e) {
+                return super.getString(pResId);
+            }
+        }
+
+        @Override
+        public Bitmap getBitmap(final bitmap pResId) {
+            try {
+                final int res = R.drawable.class.getDeclaredField(pResId.name()).getInt(null);
+                return BitmapFactory.decodeResource(mContext.getResources(), res);
+            } catch (final Exception e) {
+                return super.getBitmap(pResId);
+            }
+        }
+
+        @Override
+        public Drawable getDrawable(final bitmap pResId) {
+            try {
+                final int res = R.drawable.class.getDeclaredField(pResId.name()).getInt(null);
+                return mContext.getResources().getDrawable(res);
+            } catch (final Exception e) {
+                return super.getDrawable(pResId);
+            }
+        }
+    }
 
     private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
     private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
@@ -59,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
+        map.getProjection();
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -119,19 +231,50 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(poi.type() +":"+poi.location().getLatitude() +":"+ poi.location().getLongitude() +":" + poi.name() +":"+ poi.address());
         }
 
-        OverlayItem item1 = new OverlayItem("Palais im Großen Garten", "Dresden", new GeoPoint(51.03785, 13.76288));
-        item1.setMarker(getResources().getDrawable(R.drawable.marker_default, getBaseContext().getTheme()));
-        OverlayItem item2 = new OverlayItem("Frauenkirche", "Dresden", new GeoPoint(51.05173, 13.74117));
-        item2.setMarker(getResources().getDrawable(R.drawable.marker_default, getBaseContext().getTheme()));
-
         ArrayList overlayItemArray = new ArrayList<OverlayItem>();
-        overlayItemArray.add(item1);
-        overlayItemArray.add(item1);
+        for (int i = 0; i < _list_poi.size(); ++i) {
+            OverlayItem item = new OverlayItem(_list_poi.get(i).name(), _list_poi.get(i).address(),
+                    new GeoPoint(_list_poi.get(i).location().getLatitude(), _list_poi.get(i).location().getLongitude()));
+            switch (_list_poi.get(i).type()) {
+                case 1:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_default));
+                    break;
+                case 2:
+                    item.setMarker(getResources().getDrawable(R.drawable.ic_five));
+                    break;
+            }
 
-        ItemizedIconOverlay<OverlayItem> itemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(this, overlayItemArray, null);
+            overlayItemArray.add(item);
+        }
+
+        ItemizedIconOverlay<OverlayItem> itemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, new ResourceProxyImpl(this));
 
         // Add the overlay to the MapView
         map.getOverlays().add(itemizedIconOverlay);
+
+        for (Route route : _list_route) {
+            PathOverlay path = parseGpxFile(this, "tracks/"+route.id()+".gpx");
+            switch (route.classification()) {
+                case 1:
+                    path.setColor(Color.RED);
+                    break;
+
+                case 2:
+                    path.setColor(Color.YELLOW);
+                    break;
+
+                case 3:
+                    path.setColor(Color.GREEN);
+                    break;
+
+                default:
+                    path.setColor(Color.GRAY);
+            }
+            map.getOverlays().add(path);
+        }
+
+        map.postInvalidate();
+
 
         // Initializing Drawer Layout and ActionBarToggle
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);

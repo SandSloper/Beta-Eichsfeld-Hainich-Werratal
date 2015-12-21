@@ -8,11 +8,13 @@ import android.os.Parcelable;
 
 public class Route implements Parcelable {
 
-    public Route(int id, String name)
+    public Route(int id, String name, int classification)
     {
         _id = id;
         _name = name;
+        _classification =  classification;
     }
+
     public int describeContents() {
         return 0;
     }
