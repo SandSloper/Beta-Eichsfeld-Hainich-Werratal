@@ -1,8 +1,5 @@
 package com.naturpark;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -10,7 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -20,18 +17,19 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.location.LocationManager;
+
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.naturpark.data.Obstacle;
+import com.naturpark.data.Poi;
+import com.naturpark.data.Route;
 
 import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
-import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.bonuspack.overlays.Polyline;
-
 import org.osmdroid.views.overlay.PathOverlay;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -39,14 +37,9 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.naturpark.DbManager;
-import com.naturpark.GpsListener;
-
-import com.naturpark.data.Route;
-import com.naturpark.data.Obstacle;
-import com.naturpark.data.Poi;
-
 public class MainActivity extends AppCompatActivity {
+
+    private GoogleApiClient client;
 
     public PathOverlay parseGpxFile(Context context, String filename) {
 
@@ -65,14 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
                     case XmlPullParser.START_TAG:
                         String tag = parser.getName();
-
-                        /*
-                        if (tag.compareTo("number") == 0) {
-                            int numberRoutePoints = Integer.parseInt(parser.getAttributeValue(null, "numpoints"));
-                            int totalWaypoints = Integer.parseInt(parser.getAttributeValue(null, "numwpts"));
-                            Log.i("", "   Total points = " + numberRoutePoints + " Total waypoints = " + totalWaypoints);
-                        }
-                        */
 
                         if (tag.compareTo("trkpt") == 0) {
                             double lat = Double.parseDouble(parser.getAttributeValue(null, "lat"));
@@ -100,8 +85,6 @@ public class MainActivity extends AppCompatActivity {
 
         return pathOverlay;
     }
-
-
 
     public class ResourceProxyImpl extends DefaultResourceProxyImpl {
 
@@ -143,10 +126,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static final long MINIMUM_DISTANCE_CHANGE_FOR_UPDATES = 1; // in Meters
-    private static final long MINIMUM_TIME_BETWEEN_UPDATES = 1000; // in Milliseconds
-
-    //Defining Variables
+   //Defining Variables
     private Toolbar toolbar;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
@@ -164,9 +144,8 @@ public class MainActivity extends AppCompatActivity {
 
         MapView map = (MapView) findViewById(R.id.mapview);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
-        map.getController().setZoom(15);
-        //map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
-        map.getController().setCenter(new GeoPoint(51.05446, 13.73636));
+        map.getController().setZoom(10);
+        map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
@@ -198,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                                                                  switch (menuItem.getItemId()) {
                                                                      //Replacing the main content with ContentFragment Which is our Inbox View;
                                                                      case R.id.start:
-                                                                       // fehlt noch.....
+                                                                         // fehlt noch.....
                                                                          return true;
 
                                                                      case R.id.list_route:
@@ -213,11 +192,6 @@ public class MainActivity extends AppCompatActivity {
                                                          }
         );
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                MINIMUM_TIME_BETWEEN_UPDATES, MINIMUM_DISTANCE_CHANGE_FOR_UPDATES, new GpsListener(this));
-
         DbManager dbManager = new DbManager(this);
         _list_route = dbManager.queryRouteList();
         _list_poi = dbManager.queryPoiList();
@@ -225,35 +199,36 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("num route:" + _list_route.size());
         System.out.println("num_poi:" + _list_poi.size());
         System.out.println("num_obstacle:" + _list_obstacle.size());
-        for (int i = 0; i < _list_poi.size(); ++i)
-        {
+        for (int i = 0; i < _list_poi.size(); ++i) {
             Poi poi = _list_poi.get(i);
-            System.out.println(poi.type() +":"+poi.location().getLatitude() +":"+ poi.location().getLongitude() +":" + poi.name() +":"+ poi.address());
+            System.out.println(poi.type() + ":" + poi.location().getLatitude() + ":" + poi.location().getLongitude() + ":" + poi.name() + ":" + poi.address());
         }
 
         ArrayList overlayItemArray = new ArrayList<OverlayItem>();
         for (int i = 0; i < _list_poi.size(); ++i) {
             OverlayItem item = new OverlayItem(_list_poi.get(i).name(), _list_poi.get(i).address(),
                     new GeoPoint(_list_poi.get(i).location().getLatitude(), _list_poi.get(i).location().getLongitude()));
+            Drawable marker_cat1 = this.getResources().getDrawable(R.drawable.marker_cat1);
+            Drawable marker_cat2 = this.getResources().getDrawable(R.drawable.marker_cat2);
             switch (_list_poi.get(i).type()) {
                 case 1:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_default));
+                    item.setMarker(marker_cat1);
                     break;
                 case 2:
-                    item.setMarker(getResources().getDrawable(R.drawable.ic_five));
+                    item.setMarker(marker_cat2);
                     break;
             }
 
             overlayItemArray.add(item);
         }
 
-        ItemizedIconOverlay<OverlayItem> itemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, new ResourceProxyImpl(this));
+       ItemizedIconOverlay<OverlayItem> itemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, new ResourceProxyImpl(this));
 
         // Add the overlay to the MapView
         map.getOverlays().add(itemizedIconOverlay);
 
         for (Route route : _list_route) {
-            PathOverlay path = parseGpxFile(this, "tracks/"+route.id()+".gpx");
+            PathOverlay path = parseGpxFile(this, "tracks/" + route.id() + ".gpx");
             switch (route.classification()) {
                 case 1:
                     path.setColor(Color.RED);
@@ -268,13 +243,10 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 default:
-                    path.setColor(Color.GRAY);
+                    path.setColor(Color.RED);
             }
             map.getOverlays().add(path);
         }
-
-        map.postInvalidate();
-
 
         // Initializing Drawer Layout and ActionBarToggle
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
@@ -300,6 +272,9 @@ public class MainActivity extends AppCompatActivity {
 
         //calling sync state is necessay or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     public void startListRouteActivity() {
