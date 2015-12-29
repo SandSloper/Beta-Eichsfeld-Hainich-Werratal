@@ -3,6 +3,7 @@ package com.naturpark;
 /**
  * Created by frenzel on 12/20/15.
  */
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -35,25 +36,14 @@ public class DbManager extends SQLiteOpenHelper {
 
     private SQLiteDatabase _database;
 
+    public DbManager(Context context, boolean enforce_copy) {
+        super(context, context.getString(R.string.database), null, 1);
+        _init(context, enforce_copy);
+    }
+
     public DbManager(Context context) {
         super(context, context.getString(R.string.database), null, 1);
-
-        DB_PATH = DB_PATH_PREFIX + context.getPackageName() + DB_PATH_SUFFIX + "/";
-        try {
-            copy(context);
-        }
-        catch (IOException e)
-        {
-            System.out.println("IoException:" + e.getMessage());
-        }
-
-        try {
-            open();
-        }
-        catch (SQLException e)
-        {
-            System.out.println("SQLException:" + e.getMessage());
-        }
+        _init(context, false);
     }
 
     public void finalize()
@@ -134,15 +124,16 @@ public class DbManager extends SQLiteOpenHelper {
         List<PoiType> list_poi_type = new ArrayList<PoiType>();
 
         try {
-            Cursor cursor = _database.rawQuery("SELECT id, name, icon_name FROM Poi_type;", null);
+            Cursor cursor = _database.rawQuery("SELECT id, name, icon_name, visible FROM Poi_type;", null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
                 int id = cursor.getInt(cursor.getColumnIndex("id"));
                 String name = cursor.getString(cursor.getColumnIndex("name"));
                 String iconName = cursor.getString(cursor.getColumnIndex("icon_name"));
+                boolean visible = cursor.getInt(cursor.getColumnIndex("visible")) > 0;
 
-                list_poi_type.add(new PoiType(id, name, iconName));
+                list_poi_type.add(new PoiType(id, name, iconName, visible));
 
                 cursor.moveToNext();
             }
@@ -188,13 +179,22 @@ public class DbManager extends SQLiteOpenHelper {
         return list_poi;
     }
 
+    public void update(PoiType poiType)
+    {
+        System.out.println("...............................................update:" + poiType.id());
+        ContentValues values = new ContentValues();
+        values.put("visible", poiType.is_visible());
+        values.put("icon_name", poiType.iconName());
+        _database.update("Poi_type", values, "id="+poiType.id(), null);
+    }
+
     public void onCreate(SQLiteDatabase db) {
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    private void copy(Context context) throws IOException {
+    private void copy(Context context, boolean enforce_copy) throws IOException {
         InputStream assetsDB = context.getAssets().open(getDatabaseName());
         File file = new File(DB_PATH);
 
@@ -203,7 +203,7 @@ public class DbManager extends SQLiteOpenHelper {
         }
 
         File file_out = new File(DB_PATH + getDatabaseName());
-        if (file_out.exists()) {
+        if (file_out.exists() && enforce_copy) {
             System.out.println("delete database file");
             file_out.delete();
         }
@@ -216,5 +216,25 @@ public class DbManager extends SQLiteOpenHelper {
         }
         out.flush();
         out.close();
+    }
+
+    private void _init(Context context, boolean enforce_copy) {
+
+        DB_PATH = DB_PATH_PREFIX + context.getPackageName() + DB_PATH_SUFFIX + "/";
+        try {
+            copy(context, enforce_copy);
+        }
+        catch (IOException e)
+        {
+            System.out.println("IoException:" + e.getMessage());
+        }
+
+        try {
+            open();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("SQLException:" + e.getMessage());
+        }
     }
 }

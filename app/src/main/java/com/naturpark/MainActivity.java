@@ -18,8 +18,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.naturpark.data.Obstacle;
 import com.naturpark.data.Poi;
 import com.naturpark.data.Route;
@@ -47,8 +45,6 @@ import com.naturpark.data.Poi;
 
 public class MainActivity extends AppCompatActivity {
 
-    private GoogleApiClient client;
-
     public PathOverlay parseGpxFile(Context context, String filename) {
 
         PathOverlay pathOverlay = new PathOverlay(Color.BLUE, context);
@@ -72,13 +68,13 @@ public class MainActivity extends AppCompatActivity {
                             double lon = Double.parseDouble(parser.getAttributeValue(null, "lon"));
                             pathOverlay.addPoint(new GeoPoint(lat, lon));
 
-                            Log.i("", "   trackpoint= latitude=" + lat + " longitude=" + lon);
+                            //Log.i("", "   trackpoint= latitude=" + lat + " longitude=" + lon);
 
                         } else if (tag.compareTo("wpt") == 0) {
                             double lat = Double.parseDouble(parser.getAttributeValue(null, "lat"));
                             double lon = Double.parseDouble(parser.getAttributeValue(null, "lon"));
                             String description = parser.getAttributeValue(null, "description");
-                            Log.i("", "   waypoint=" + " latitude=" + lat + " longitude=" + lon + " " + description);
+                            //Log.i("", "   waypoint=" + " latitude=" + lat + " longitude=" + lon + " " + description);
                         }
                         break;
                 }
@@ -153,8 +149,9 @@ public class MainActivity extends AppCompatActivity {
 
         MapView map = (MapView) findViewById(R.id.mapview);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
-        map.getController().setZoom(10);
-        map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
+        map.getController().setZoom(14);
+        //map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
+        map.getController().setCenter(new GeoPoint(51.05446, 13.73636));
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
@@ -193,6 +190,10 @@ public class MainActivity extends AppCompatActivity {
                                                                          startListRouteActivity();
                                                                          return true;
 
+                                                                     case R.id.list_poi_type:
+                                                                         startListPoiTypeActivity();
+                                                                         return true;
+
                                                                      default:
                                                                          // fehlt noch.....
                                                                          return true;
@@ -201,7 +202,8 @@ public class MainActivity extends AppCompatActivity {
                                                          }
         );
 
-        DbManager dbManager = new DbManager(this);
+        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        DbManager dbManager = new DbManager(this, false);
         _list_route = dbManager.queryRouteList();
         _list_poi_type = dbManager.queryPoiTypeList();
         _list_poi = dbManager.queryPoiList();
@@ -210,69 +212,15 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("num_poi_type:" + _list_poi_type.size());
         System.out.println("num_poi:" + _list_poi.size());
         System.out.println("num_obstacle:" + _list_obstacle.size());
+
         for (int i = 0; i < _list_poi.size(); ++i) {
             Poi poi = _list_poi.get(i);
             System.out.println(poi.type() + ":" + poi.location().getLatitude() + ":" + poi.location().getLongitude() + ":" + poi.name() + ":" + poi.address());
         }
 
-        ArrayList overlayItemArray = new ArrayList<OverlayItem>();
-        for (Poi poi : _list_poi) {
-            OverlayItem item = new OverlayItem(poi.name(), poi.address(),
-                    new GeoPoint(poi.location().getLatitude(), poi.location().getLongitude()));
-            PoiType poiType = _getPoiType(poi.type());
-            if (poiType != null)
-                item.setMarker(getResources().getDrawable(getResources().getIdentifier(poiType.icon_name(), "drawable", getPackageName())));
-
-            if (poiType.is_visible())
-                overlayItemArray.add(item);
-        }
-
-        for (Obstacle obstacle : _list_obstacle) {
-            OverlayItem item = new OverlayItem(obstacle.name(), obstacle.name(),
-                    new GeoPoint(obstacle.location().getLatitude(), obstacle.location().getLongitude()));
-            switch (obstacle.type()) {
-                case 1:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_yellow));
-                    break;
-                case 2:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_blue));
-                    break;
-                case 3:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_red));
-                    break;
-                default:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_default));
-                    break;
-            }
-
-            overlayItemArray.add(item);
-        }
-
-       ItemizedIconOverlay<OverlayItem> itemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, new ResourceProxyImpl(this));
-
-        // Add the overlay to the MapView
-        map.getOverlays().add(itemizedIconOverlay);
-
-        for (Route route : _list_route) {
-            PathOverlay path = parseGpxFile(this, "tracks/" + route.id() + ".gpx");
-            switch (route.classification()) {
-                case 1:
-                    path.setColor(Color.RED);
-                    break;
-
-                case 2:
-                    path.setColor(Color.YELLOW);
-                    break;
-
-                case 3:
-                    path.setColor(Color.GREEN);
-                    break;
-
-                default:
-                    path.setColor(Color.RED);
-            }
-            map.getOverlays().add(path);
-        }
+        _addPoiToMap(map);
+        _addObstaclesToMap(map);
+        _addRoutesToMap(map);
 
         // Initializing Drawer Layout and ActionBarToggle
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
@@ -298,14 +246,44 @@ public class MainActivity extends AppCompatActivity {
 
         //calling sync state is necessay or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    protected  void onResume() {
+        super.onResume();
+
+        System.out.println("#######################################################################################");
+
+        DbManager dbManager = new DbManager(this);
+        _list_route.clear();
+        _list_route = dbManager.queryRouteList();
+        _list_poi_type.clear();
+        _list_poi_type = dbManager.queryPoiTypeList();
+        _list_poi.clear();
+        _list_poi = dbManager.queryPoiList();
+        _list_obstacle.clear();
+        _list_obstacle = dbManager.queryObstacleList();
+
+        MapView map = (MapView) findViewById(R.id.mapview);
+        map.getOverlays().clear();
+        _addPoiToMap(map);
+        _addObstaclesToMap(map);
+        _addRoutesToMap(map);
+     }
 
     public void startListRouteActivity() {
 
         Intent intent = new Intent(this, RouteListActivity.class);
+        startActivity(intent);
+    }
+
+    public void startListPoiTypeActivity() {
+
+        Intent intent = new Intent(this, PoiTypeListActivity.class);
         startActivity(intent);
     }
 
@@ -325,5 +303,73 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return null;
+    }
+
+
+    private void _addPoiToMap(MapView map) {
+        ArrayList overlayItemArray = new ArrayList<OverlayItem>();
+
+        for (Poi poi : _list_poi) {
+            OverlayItem item = new OverlayItem(poi.name(), poi.address(),
+                    new GeoPoint(poi.location().getLatitude(), poi.location().getLongitude()));
+            PoiType poiType = _getPoiType(poi.type());
+            if (poiType != null)
+                item.setMarker(getResources().getDrawable(getResources().getIdentifier(poiType.iconName(), "drawable", getPackageName())));
+
+            if (poiType.is_visible())
+                overlayItemArray.add(item);
+        }
+
+        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, new ResourceProxyImpl(this)));
+    }
+
+    private void _addObstaclesToMap(MapView map) {
+        ArrayList overlayItemArray = new ArrayList<OverlayItem>();
+
+        for (Obstacle obstacle : _list_obstacle) {
+            OverlayItem item = new OverlayItem(obstacle.name(), obstacle.name(),
+                    new GeoPoint(obstacle.location().getLatitude(), obstacle.location().getLongitude()));
+            switch (obstacle.type()) {
+                case 1:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_yellow));
+                    break;
+                case 2:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_blue));
+                    break;
+                case 3:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_red));
+                    break;
+                default:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_default));
+                    break;
+            }
+
+            overlayItemArray.add(item);
+        }
+
+        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, new ResourceProxyImpl(this)));
+    }
+
+    private void _addRoutesToMap(MapView map) {
+        for (Route route : _list_route) {
+            PathOverlay path = parseGpxFile(this, "tracks/" + route.id() + ".gpx");
+            switch (route.classification()) {
+                case 1:
+                    path.setColor(Color.RED);
+                    break;
+
+                case 2:
+                    path.setColor(Color.YELLOW);
+                    break;
+
+                case 3:
+                    path.setColor(Color.GREEN);
+                    break;
+
+                default:
+                    path.setColor(Color.RED);
+            }
+            map.getOverlays().add(path);
+        }
     }
 }
