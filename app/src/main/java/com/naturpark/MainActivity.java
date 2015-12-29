@@ -42,6 +42,7 @@ import java.util.List;
 import com.naturpark.DbManager;
 import com.naturpark.GpsListener;
 
+import com.naturpark.data.PoiType;
 import com.naturpark.data.Route;
 import com.naturpark.data.Obstacle;
 import com.naturpark.data.Poi;
@@ -154,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationManager locationManager;
 
     private List<Route> _list_route;
+    private List<PoiType> _list_poi_type;
     private List<Poi> _list_poi;
     private List<Obstacle> _list_obstacle;
 
@@ -220,11 +222,14 @@ public class MainActivity extends AppCompatActivity {
 
         DbManager dbManager = new DbManager(this);
         _list_route = dbManager.queryRouteList();
+        _list_poi_type = dbManager.queryPoiTypeList();
         _list_poi = dbManager.queryPoiList();
         _list_obstacle = dbManager.queryObstacleList();
         System.out.println("num route:" + _list_route.size());
+        System.out.println("num_poi_type:" + _list_poi_type.size());
         System.out.println("num_poi:" + _list_poi.size());
         System.out.println("num_obstacle:" + _list_obstacle.size());
+
         for (int i = 0; i < _list_poi.size(); ++i)
         {
             Poi poi = _list_poi.get(i);
@@ -232,15 +237,32 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ArrayList overlayItemArray = new ArrayList<OverlayItem>();
-        for (int i = 0; i < _list_poi.size(); ++i) {
-            OverlayItem item = new OverlayItem(_list_poi.get(i).name(), _list_poi.get(i).address(),
-                    new GeoPoint(_list_poi.get(i).location().getLatitude(), _list_poi.get(i).location().getLongitude()));
-            switch (_list_poi.get(i).type()) {
+        for (Poi poi : _list_poi) {
+            OverlayItem item = new OverlayItem(poi.name(), poi.address(),
+                    new GeoPoint(poi.location().getLatitude(), poi.location().getLongitude()));
+            PoiType poiType = _getPoiType(poi.type());
+            if (poiType != null)
+                item.setMarker(getResources().getDrawable(getResources().getIdentifier(poiType.icon_name(), "drawable", getPackageName())));
+
+            if (poiType.is_visible())
+                overlayItemArray.add(item);
+        }
+
+        for (Obstacle obstacle : _list_obstacle) {
+            OverlayItem item = new OverlayItem(obstacle.name(), obstacle.name(),
+                    new GeoPoint(obstacle.location().getLatitude(), obstacle.location().getLongitude()));
+            switch (obstacle.type()) {
                 case 1:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_default));
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_yellow));
                     break;
                 case 2:
-                    item.setMarker(getResources().getDrawable(R.drawable.ic_five));
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_blue));
+                    break;
+                case 3:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_red));
+                    break;
+                default:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_default));
                     break;
             }
 
@@ -315,4 +337,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
     */
+
+    private PoiType _getPoiType(int id) {
+        for (PoiType poiType : _list_poi_type) {
+
+            if (poiType.id() == id)
+                return poiType;
+        }
+
+        return null;
+    }
 }

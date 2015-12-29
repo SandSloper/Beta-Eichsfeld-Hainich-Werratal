@@ -7,4 +7,5 @@
     <string name="openDrawer">Navigation View Closed</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_route_list">RouteListActivity</string>
+    <string name="database">naturpark2.db</string>
 </resources>

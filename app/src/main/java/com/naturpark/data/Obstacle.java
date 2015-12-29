@@ -17,6 +17,7 @@ public class Obstacle {
     }
 
     public int type() { return  _type; }
+    public String name() { return "xyz"; }
     public int route_id() { return _route_id; }
     public Location location() { return _location; }
 

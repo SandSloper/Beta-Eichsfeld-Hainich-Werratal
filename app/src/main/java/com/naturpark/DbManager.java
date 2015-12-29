@@ -11,9 +11,10 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 
-import com.naturpark.data.Obstacle;
-import com.naturpark.data.Poi;
 import com.naturpark.data.Route;
+import com.naturpark.data.Obstacle;
+import com.naturpark.data.PoiType;
+import com.naturpark.data.Poi;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,12 +32,11 @@ public class DbManager extends SQLiteOpenHelper {
     private static String DB_PATH;
     private static String DB_PATH_PREFIX = "/data/data/";
     private static String DB_PATH_SUFFIX = "/databases/";
-    private static String DB_NAME = "naturparke.db";
 
     private SQLiteDatabase _database;
 
     public DbManager(Context context) {
-        super(context, DB_NAME, null, 1);
+        super(context, context.getString(R.string.database), null, 1);
 
         DB_PATH = DB_PATH_PREFIX + context.getPackageName() + DB_PATH_SUFFIX + "/";
         try {
@@ -63,7 +63,7 @@ public class DbManager extends SQLiteOpenHelper {
 
 
     public void open() throws SQLException {
-        _database = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+        _database = SQLiteDatabase.openDatabase(DB_PATH + getDatabaseName(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
     }
 
     public synchronized void close() {
@@ -129,6 +129,32 @@ public class DbManager extends SQLiteOpenHelper {
         return list_obstacle;
     }
 
+    public List<PoiType> queryPoiTypeList()
+    {
+        List<PoiType> list_poi_type = new ArrayList<PoiType>();
+
+        try {
+            Cursor cursor = _database.rawQuery("SELECT id, name, icon_name FROM Poi_type;", null);
+            cursor.moveToFirst();
+
+            while (!cursor.isAfterLast()) {
+                int id = cursor.getInt(cursor.getColumnIndex("id"));
+                String name = cursor.getString(cursor.getColumnIndex("name"));
+                String iconName = cursor.getString(cursor.getColumnIndex("icon_name"));
+
+                list_poi_type.add(new PoiType(id, name, iconName));
+
+                cursor.moveToNext();
+            }
+        }
+        catch (SQLiteException e)
+        {
+            System.out.println("SQLiteException:" + e.getMessage());
+        }
+
+        return list_poi_type;
+    }
+
     public List<Poi> queryPoiList()
     {
         List<Poi> list_poi = new ArrayList<Poi>();
@@ -169,14 +195,20 @@ public class DbManager extends SQLiteOpenHelper {
     }
 
     private void copy(Context context) throws IOException {
-        InputStream assetsDB = context.getAssets().open(DB_NAME);
+        InputStream assetsDB = context.getAssets().open(getDatabaseName());
         File file = new File(DB_PATH);
 
         if (file.exists() == false) {
             file.mkdir();
         }
 
-        OutputStream out = new FileOutputStream(DB_PATH + DB_NAME);
+        File file_out = new File(DB_PATH + getDatabaseName());
+        if (file_out.exists()) {
+            System.out.println("delete database file");
+            file_out.delete();
+        }
+
+        OutputStream out = new FileOutputStream(DB_PATH + getDatabaseName());
         byte[] buffer = new byte[1024];
         int length;
         while ((length = assetsDB.read(buffer)) > 0) {
