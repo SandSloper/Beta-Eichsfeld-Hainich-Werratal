@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('osmdroid-android-5.0.1-sources.jar'))

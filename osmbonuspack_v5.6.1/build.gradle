@@ -1,2 +1,0 @@
-configurations.create("default")
-artifacts.add("default", file('osmbonuspack_v5.6.1.aar'))

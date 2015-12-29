@@ -1,25 +1,15 @@
 package com.naturpark;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.os.Bundle;
-import android.location.Location;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.naturpark.data.Route;
-import com.naturpark.data.Obstacle;
-import com.naturpark.data.Poi;
+
+import java.util.List;
 
 public class RouteListActivity extends AppCompatActivity {
 
