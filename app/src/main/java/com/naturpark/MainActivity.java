@@ -15,8 +15,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naturpark.data.Obstacle;
 import com.naturpark.data.Poi;
@@ -27,6 +30,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.xmlpull.v1.XmlPullParser;
@@ -172,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
                                                              // This method will trigger on item Click of navigation menu
                                                              @Override
                                                              public boolean onNavigationItemSelected(MenuItem menuItem) {
+                                                                 System.out.println("xxxxxxxxxxxxxx"+ menuItem.getItemId());
                                                                  //Checking if the item is in checked state or not, if not make it in checked state
                                                                  if (menuItem.isChecked())
                                                                      menuItem.setChecked(false);
@@ -305,7 +310,6 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-
     private void _addPoiToMap(MapView map) {
         ArrayList overlayItemArray = new ArrayList<OverlayItem>();
 
@@ -320,7 +324,23 @@ public class MainActivity extends AppCompatActivity {
                 overlayItemArray.add(item);
         }
 
-        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, new ResourceProxyImpl(this)));
+        ItemizedIconOverlay.OnItemGestureListener gestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+            @Override
+            public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                //TextView item_info =  (TextView)findViewById(R.id.item_info_window);
+                //item_info.setText(item.getTitle());
+                Toast.makeText(getApplicationContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            @Override
+            public boolean onItemLongPress(final int index, final OverlayItem item) {
+                Toast.makeText(getApplicationContext(), item.getSnippet(), Toast.LENGTH_LONG).show();
+                return true;
+            }
+        };
+
+        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, gestureListener, new ResourceProxyImpl(this)));
     }
 
     private void _addObstaclesToMap(MapView map) {
@@ -347,7 +367,21 @@ public class MainActivity extends AppCompatActivity {
             overlayItemArray.add(item);
         }
 
-        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, new ResourceProxyImpl(this)));
+        ItemizedIconOverlay.OnItemGestureListener gestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
+            @Override
+            public boolean onItemSingleTapUp(final int index, final OverlayItem item) {
+                Toast.makeText(getApplicationContext(), item.getTitle(), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            @Override
+            public boolean onItemLongPress(final int index, final OverlayItem item) {
+                Toast.makeText(getApplicationContext(), item.getSnippet(), Toast.LENGTH_LONG).show();
+                return true;
+            }
+        };
+
+        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, gestureListener, new ResourceProxyImpl(this)));
     }
 
     private void _addRoutesToMap(MapView map) {
