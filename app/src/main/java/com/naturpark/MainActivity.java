@@ -2,6 +2,7 @@ package com.naturpark;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,10 +16,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.naturpark.data.Obstacle;
@@ -30,7 +29,6 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 import org.xmlpull.v1.XmlPullParser;
@@ -39,13 +37,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.naturpark.DbManager;
-import com.naturpark.GpsListener;
-
 import com.naturpark.data.PoiType;
-import com.naturpark.data.Route;
-import com.naturpark.data.Obstacle;
-import com.naturpark.data.Poi;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -134,8 +126,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-   //Defining Variables
+    private boolean _creating;
+    private SharedPreferences _preferences;
+
     private Toolbar toolbar;
+    private MapView map;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
@@ -146,20 +141,25 @@ public class MainActivity extends AppCompatActivity {
     private List<Poi> _list_poi;
     private List<Obstacle> _list_obstacle;
 
+    int _route_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        _creating = true;
+        _preferences = getSharedPreferences("naturpark.prf", MODE_PRIVATE);
+
         setContentView(R.layout.activity_main);
 
-        MapView map = (MapView) findViewById(R.id.mapview);
+        map = (MapView) findViewById(R.id.mapview);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
-        map.getController().setZoom(14);
+        map.getController().setZoom(_preferences.getInt("ZoomLevel", 10));
         //map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
-        map.getController().setCenter(new GeoPoint(51.05446, 13.73636));
+        map.getController().setCenter(new GeoPoint(_preferences.getFloat("Latitude", (float)51.05446), _preferences.getFloat("Longitude", (float)13.73636)));
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
-        map.getProjection();
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -207,26 +207,6 @@ public class MainActivity extends AppCompatActivity {
                                                          }
         );
 
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        DbManager dbManager = new DbManager(this, false);
-        _list_route = dbManager.queryRouteList();
-        _list_poi_type = dbManager.queryPoiTypeList();
-        _list_poi = dbManager.queryPoiList();
-        _list_obstacle = dbManager.queryObstacleList();
-        System.out.println("num route:" + _list_route.size());
-        System.out.println("num_poi_type:" + _list_poi_type.size());
-        System.out.println("num_poi:" + _list_poi.size());
-        System.out.println("num_obstacle:" + _list_obstacle.size());
-
-        for (int i = 0; i < _list_poi.size(); ++i) {
-            Poi poi = _list_poi.get(i);
-            System.out.println(poi.type() + ":" + poi.location().getLatitude() + ":" + poi.location().getLongitude() + ":" + poi.name() + ":" + poi.address());
-        }
-
-        _addPoiToMap(map);
-        _addObstaclesToMap(map);
-        _addRoutesToMap(map);
-
         // Initializing Drawer Layout and ActionBarToggle
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
 
@@ -248,57 +228,77 @@ public class MainActivity extends AppCompatActivity {
 
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
-
-        //calling sync state is necessay or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
+    protected  void onStart() {
+        super.onStart();
 
-    protected  void onResume() {
-        super.onResume();
+        System.out.println("####################################################################################### onStart");
 
-        System.out.println("#######################################################################################");
+        _route_id = getIntent().getIntExtra("Route", 0);
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:route:" + _route_id);
 
-        DbManager dbManager = new DbManager(this);
-        _list_route.clear();
+
+        DbManager dbManager = new DbManager(this, _creating);
+        _creating = false;
+
         _list_route = dbManager.queryRouteList();
-        _list_poi_type.clear();
         _list_poi_type = dbManager.queryPoiTypeList();
-        _list_poi.clear();
         _list_poi = dbManager.queryPoiList();
-        _list_obstacle.clear();
         _list_obstacle = dbManager.queryObstacleList();
+        System.out.println("num route:" + _list_route.size());
+        System.out.println("num_poi_type:" + _list_poi_type.size());
+        System.out.println("num_poi:" + _list_poi.size());
+        System.out.println("num_obstacle:" + _list_obstacle.size());
 
         MapView map = (MapView) findViewById(R.id.mapview);
         map.getOverlays().clear();
         _addPoiToMap(map);
         _addObstaclesToMap(map);
         _addRoutesToMap(map);
-     }
+    }
+
+    @Override
+    protected  void onResume() {
+        super.onResume();
+
+        System.out.println("####################################################################################### onResume");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        System.out.println("####################################################################################### onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        System.out.println("####################################################################################### onStop");
+
+        SharedPreferences.Editor editor = _preferences.edit();
+        editor.putFloat("Latitude", (float)map.getMapCenter().getLatitude());
+        editor.putFloat("Longitude", (float)map.getMapCenter().getLongitude());
+        editor.putInt("ZoomLevel", map.getZoomLevel());
+        editor.commit();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("####################################################################################### onDestroy");
+    }
+
 
     public void startListRouteActivity() {
-
-        Intent intent = new Intent(this, RouteListActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(this, RouteListActivity.class));
     }
 
     public void startListPoiTypeActivity() {
-
-        Intent intent = new Intent(this, PoiTypeListActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(this, PoiTypeListActivity.class));
     }
-
-    /*
-    public void startListPoiActivity() {
-
-        Intent intent = new Intent(this, PoiListActivity.class);
-        startActivity(intent);
-    }
-    */
 
     private PoiType _getPoiType(int id) {
         for (PoiType poiType : _list_poi_type) {
@@ -387,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
     private void _addRoutesToMap(MapView map) {
         for (Route route : _list_route) {
             PathOverlay path = parseGpxFile(this, "tracks/" + route.id() + ".gpx");
-            switch (route.classification()) {
+            switch (route.rating()) {
                 case 1:
                     path.setColor(Color.RED);
                     break;

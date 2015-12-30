@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.0">
+	<name>Example gpx</name>
+	<wpt lat="46.57638889" lon="8.89263889">
+		<ele>2372</ele>
+		<name>LAGORETICO</name>
+	</wpt>
+	<trk><name>Example gpx</name><number>1</number><trkseg>
+		<trkpt lat="51.05286" lon="13.73854"><ele>160</ele><time>2015-12-01T00:00:57Z</time></trkpt>
+		<trkpt lat="51.05235" lon="13.7395"><ele>160</ele><time>2015-12-01T00:00:57Z</time></trkpt>
+		<trkpt lat="51.05179" lon="13.74054"><ele>160</ele><time>2015-12-01T00:00:57Z</time></trkpt>
+		<trkpt lat="51.05125" lon="13.74403"><ele>160</ele><time>2015-12-01T00:00:57Z</time></trkpt>
+	</trkseg></trk>
+</gpx>
+

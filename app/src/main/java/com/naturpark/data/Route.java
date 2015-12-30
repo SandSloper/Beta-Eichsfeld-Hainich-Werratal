@@ -8,11 +8,16 @@ import android.os.Parcelable;
 
 public class Route implements Parcelable {
 
-    public Route(int id, String name, int classification)
+    public Route(int id, String region, String name, float length, int grade_avg, int grade_max, int quality, int rating)
     {
         _id = id;
+        _region = region;
         _name = name;
-        _classification =  classification;
+        _length = length;
+        _grade_avg = grade_avg;
+        _grade_max = grade_max;
+        _quality = quality;
+        _rating =  rating;
     }
 
     public int describeContents() {
@@ -42,12 +47,20 @@ public class Route implements Parcelable {
 
 
     public int id() { return _id; }
+    public String region() { return _region; }
     public String name() { return _name; }
-    public int length() { return _length; }
-    public int classification() { return _classification; }
+    public float length() { return _length; }
+    public int slope_avg() { return _grade_avg; }
+    public int slope_max() { return _grade_max; }
+    public int quality() { return _quality; }
+    public int rating() { return _rating; }
 
     private int _id;
+    private String _region;
     private String _name;
-    private int _length;
-    private int _classification;
+    private float _length;
+    private int _grade_avg;
+    private int _grade_max;
+    private int _quality;
+    private int _rating;
 }

@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd" creator="Bike Route Toaster http://bikeroutetoaster.com/" version="1.0">
+  <author>BikeRouteToaster.com</author>
+  <trk>
+    <name>5</name>
+    <trkseg>
+      <trkpt lat="51.04789" lon="13.74258">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>0</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04817" lon="13.74195">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>125.258587424984</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04859" lon="13.74236">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>211.537423625844</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04879" lon="13.74206">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>136.680549779678</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04885" lon="13.7418">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>110.157192396665</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.0487" lon="13.74159">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>41.3516356136029</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04844" lon="13.74135">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>30.1266204029264</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.0484" lon="13.74129">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>43.319476948614</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04874" lon="13.74004">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>113.395977390792</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04844" lon="13.73972">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>33.8445679209968</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04832" lon="13.73955">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>41.6884257390595</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04846" lon="13.73831">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>100.180867539309</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04866" lon="13.73693">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>102.981255905321</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.04914" lon="13.73704">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>188.198078407578</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05024" lon="13.73728">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>187.810002885349</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05146" lon="13.73755">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>187.920434144992</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.0514" lon="13.73837">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>276.639585791526</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.0518" lon="13.73839">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>181.800279449537</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05173" lon="13.73912">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>278.673415925806</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05169" lon="13.74013">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>273.605351524439</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05175" lon="13.74052">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>256.248074276734</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05172" lon="13.7411">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>274.704054776793</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05226" lon="13.74129">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>192.471927909951</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05242" lon="13.74039">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>105.791128057025</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05249" lon="13.73981">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>100.868018164394</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05298" lon="13.73863">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>123.448157605148</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05333" lon="13.73809">
+        <ele>0</ele>
+        <time>2015-12-30T18:07:33Z</time>
+        <course>135.877009972779</course>
+        <speed>0</speed>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>

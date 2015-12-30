@@ -68,15 +68,20 @@ public class DbManager extends SQLiteOpenHelper {
         List<Route> list_route = new ArrayList<Route>();
 
         try {
-            Cursor cursor = _database.rawQuery("SELECT id, name, classification FROM Route;", null);
+            Cursor cursor = _database.rawQuery("SELECT id, region, name, length, grade_avg, grade_max, quality, rating FROM Route;", null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
                 int id = cursor.getInt(cursor.getColumnIndex("id"));
+                String region = cursor.getString(cursor.getColumnIndex("region"));
                 String name = cursor.getString(cursor.getColumnIndex("name"));
-                int classification = cursor.getInt(cursor.getColumnIndex("classification"));
+                float length = cursor.getFloat(cursor.getColumnIndex("length"));
+                int grade_avg = cursor.getInt(cursor.getColumnIndex("grade_avg"));
+                int grade_max = cursor.getInt(cursor.getColumnIndex("grade_max"));
+                int quality = cursor.getInt(cursor.getColumnIndex("quality"));
+                int difficulty = cursor.getInt(cursor.getColumnIndex("rating"));
 
-                list_route.add(new Route(id, name, classification));
+                list_route.add(new Route(id, region, name, length, grade_avg, grade_max, difficulty, quality));
                 cursor.moveToNext();
             }
         }
