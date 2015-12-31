@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.naturpark.data.Route;
 import com.naturpark.data.Obstacle;
@@ -79,9 +81,9 @@ public class DbManager extends SQLiteOpenHelper {
                 int grade_avg = cursor.getInt(cursor.getColumnIndex("grade_avg"));
                 int grade_max = cursor.getInt(cursor.getColumnIndex("grade_max"));
                 int quality = cursor.getInt(cursor.getColumnIndex("quality"));
-                int difficulty = cursor.getInt(cursor.getColumnIndex("rating"));
+                int rating = cursor.getInt(cursor.getColumnIndex("rating"));
 
-                list_route.add(new Route(id, region, name, length, grade_avg, grade_max, difficulty, quality));
+                list_route.add(new Route(id, region, name, length, grade_avg, grade_max, quality, rating));
                 cursor.moveToNext();
             }
         }

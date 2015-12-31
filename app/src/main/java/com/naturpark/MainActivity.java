@@ -7,8 +7,10 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.naturpark.data.Obstacle;
@@ -25,65 +28,58 @@ import com.naturpark.data.Poi;
 import com.naturpark.data.Route;
 
 import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.naturpark.data.PoiType;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MapListener, View.OnLayoutChangeListener {
 
-    public PathOverlay parseGpxFile(Context context, String filename) {
+    public PathOverlay parseGpxFile(Route route) {
 
-        PathOverlay pathOverlay = new PathOverlay(Color.BLUE, context);
+        PathOverlay pathOverlay = new PathOverlay(Color.BLUE, this);
 
-        try {
-            XmlPullParserFactory parserCreator = XmlPullParserFactory.newInstance();
-            XmlPullParser parser = parserCreator.newPullParser();
-
-            parser.setInput(context.getAssets().open(filename), null);
-
-            int parserEvent = parser.getEventType();
-            while (parserEvent != XmlPullParser.END_DOCUMENT) {
-
-                switch (parserEvent) {
-
-                    case XmlPullParser.START_TAG:
-                        String tag = parser.getName();
-
-                        if (tag.compareTo("trkpt") == 0) {
-                            double lat = Double.parseDouble(parser.getAttributeValue(null, "lat"));
-                            double lon = Double.parseDouble(parser.getAttributeValue(null, "lon"));
-                            pathOverlay.addPoint(new GeoPoint(lat, lon));
-
-                            //Log.i("", "   trackpoint= latitude=" + lat + " longitude=" + lon);
-
-                        } else if (tag.compareTo("wpt") == 0) {
-                            double lat = Double.parseDouble(parser.getAttributeValue(null, "lat"));
-                            double lon = Double.parseDouble(parser.getAttributeValue(null, "lon"));
-                            String description = parser.getAttributeValue(null, "description");
-                            //Log.i("", "   waypoint=" + " latitude=" + lat + " longitude=" + lon + " " + description);
-                        }
-                        break;
-                }
-
-                parserEvent = parser.next();
-            }
-
-        } catch (Exception e) {
-            Log.i("RouteLoader", "Failed in parsing XML", e);
+        ArrayList<GeoPoint> track = route.getTrack(this);
+        for (GeoPoint point : track) {
+            pathOverlay.addPoint(point);
         }
 
-
         return pathOverlay;
+    }
+
+    @Override
+    public boolean onScroll(ScrollEvent scrollEvent) {
+        System.out.println("SCROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOL");
+        return false;
+    }
+
+    @Override
+    public boolean onZoom(ZoomEvent zoomEvent) {
+        System.out.println("ZOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOM");
+        return false;
+    }
+
+    @Override
+    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+        System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+        System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+        System.out.println("W:" + map.getWidth() +"H:"+ map.getHeight());
+
+        if (_route_id != 0 && map.getWidth() != 0) {
+            map.zoomToBoundingBox(_get_route(_route_id).boundingBox(this));
+            _route_id = 0;
+        }
     }
 
     public class ResourceProxyImpl extends DefaultResourceProxyImpl {
@@ -160,6 +156,7 @@ public class MainActivity extends AppCompatActivity {
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
+        map.addOnLayoutChangeListener(this);
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -176,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                                                              // This method will trigger on item Click of navigation menu
                                                              @Override
                                                              public boolean onNavigationItemSelected(MenuItem menuItem) {
-                                                                 System.out.println("xxxxxxxxxxxxxx"+ menuItem.getItemId());
+                                                                 System.out.println("xxxxxxxxxxxxxx" + menuItem.getItemId());
                                                                  //Checking if the item is in checked state or not, if not make it in checked state
                                                                  if (menuItem.isChecked())
                                                                      menuItem.setChecked(false);
@@ -253,7 +250,6 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("num_poi:" + _list_poi.size());
         System.out.println("num_obstacle:" + _list_obstacle.size());
 
-        MapView map = (MapView) findViewById(R.id.mapview);
         map.getOverlays().clear();
         _addPoiToMap(map);
         _addObstaclesToMap(map);
@@ -290,7 +286,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         System.out.println("####################################################################################### onDestroy");
     }
-
 
     public void startListRouteActivity() {
         startActivity(new Intent(this, RouteListActivity.class));
@@ -386,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void _addRoutesToMap(MapView map) {
         for (Route route : _list_route) {
-            PathOverlay path = parseGpxFile(this, "tracks/" + route.id() + ".gpx");
+            PathOverlay path = parseGpxFile(route);
             switch (route.rating()) {
                 case 1:
                     path.setColor(Color.RED);
@@ -403,7 +398,20 @@ public class MainActivity extends AppCompatActivity {
                 default:
                     path.setColor(Color.RED);
             }
+
+            if (route.id() == _route_id)
+                path.getPaint().setStrokeWidth(4);
+
             map.getOverlays().add(path);
         }
+    }
+
+    private Route _get_route(int id) {
+        for (Route route : _list_route) {
+            if (route.id() == id)
+                return route;
+        }
+
+        return null;
     }
 }
