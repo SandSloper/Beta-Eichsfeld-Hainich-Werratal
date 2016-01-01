@@ -7,42 +7,36 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.Toast;
 
 import com.naturpark.data.Obstacle;
 import com.naturpark.data.Poi;
+import com.naturpark.data.PoiType;
 import com.naturpark.data.Route;
 
 import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.naturpark.data.PoiType;
 
 public class MainActivity extends AppCompatActivity implements MapListener, View.OnLayoutChangeListener {
 
@@ -151,8 +145,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         map = (MapView) findViewById(R.id.mapview);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
         map.getController().setZoom(_preferences.getInt("ZoomLevel", 10));
-        //map.getController().setCenter(new GeoPoint(51.080414, 10.434239));
-        map.getController().setCenter(new GeoPoint(_preferences.getFloat("Latitude", (float)51.05446), _preferences.getFloat("Longitude", (float)13.73636)));
+        map.getController().setCenter(new GeoPoint(_preferences.getFloat("Latitude", (float) 51.080414), _preferences.getFloat("Longitude", (float)10.434239)));
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
@@ -184,8 +177,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
                                                                  //Check to see which item was being clicked and perform appropriate action
                                                                  switch (menuItem.getItemId()) {
                                                                      //Replacing the main content with ContentFragment Which is our Inbox View;
-                                                                     case R.id.start:
-                                                                         // fehlt noch.....
+                                                                    case R.id.karte:
+                                                                         startMainActivity();
                                                                          return true;
 
                                                                      case R.id.list_route:
@@ -194,6 +187,9 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
                                                                      case R.id.list_poi_type:
                                                                          startListPoiTypeActivity();
+                                                                         return true;
+                                                                     case R.id.search:
+                                                                         startSearchPoiActivity();
                                                                          return true;
 
                                                                      default:
@@ -286,13 +282,18 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         super.onDestroy();
         System.out.println("####################################################################################### onDestroy");
     }
-
-    public void startListRouteActivity() {
+    public void startMainActivity() {
+        startActivity(new Intent(this, MainActivity.class));
+    }
+   public void startListRouteActivity() {
         startActivity(new Intent(this, RouteListActivity.class));
     }
 
     public void startListPoiTypeActivity() {
         startActivity(new Intent(this, PoiTypeListActivity.class));
+    }
+    public void startSearchPoiActivity() {
+        startActivity(new Intent(this, SearchActivity.class));
     }
 
     private PoiType _getPoiType(int id) {

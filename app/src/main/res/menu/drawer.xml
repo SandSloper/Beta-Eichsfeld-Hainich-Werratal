@@ -4,10 +4,10 @@
     <group android:checkableBehavior="single">
 
         <item
-            android:id="@+id/start"
+            android:id="@+id/karte"
             android:checked="false"
             android:icon="@drawable/ic_one"
-            android:title="Startseite" />
+            android:title="Karte" />
 
         <item
             android:id="@+id/list_route"
@@ -20,6 +20,11 @@
             android:checked="false"
             android:icon="@drawable/ic_three"
             android:title="POI auswählen" />
+        <item
+            android:id="@+id/search"
+            android:checked="false"
+            android:icon="@drawable/search"
+            android:title="Suche" />
 
     </group>
 </menu>

@@ -13,12 +13,14 @@
         android:editable="true"
         android:text="Search"/>
 
+   <!-- wird eigentlich icht mehr gebraucht
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:text="Close"
         android:id="@+id/button_close_route_list"/>
+    -->
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"

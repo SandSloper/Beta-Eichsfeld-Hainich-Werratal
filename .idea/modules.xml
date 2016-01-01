@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Naturpark_Hainich.iml" filepath="$PROJECT_DIR$/Naturpark_Hainich.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/osmbonuspack_v5.6.1/osmbonuspack_v5.6.1.iml" filepath="$PROJECT_DIR$/osmbonuspack_v5.6.1/osmbonuspack_v5.6.1.iml" />
-      <module fileurl="file://$PROJECT_DIR$/projekt_mobile_karto.iml" filepath="$PROJECT_DIR$/projekt_mobile_karto.iml" />
     </modules>
   </component>
 </project>

@@ -10,37 +10,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
-import com.naturpark.data.PoiType;
+/**
+ * Created by Loren on 30.12.2015.
+ */
+public class SearchActivity extends AppCompatActivity {
 
-import java.util.List;
-
-public class PoiTypeListActivity extends AppCompatActivity
-        implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
-
-    private List<PoiType> _list_poi_type;
-
+    private Toolbar toolbar;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_poi_type_list);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setContentView(R.layout.search);
+
+
+        // Initializing Toolbar and setting it as the actionbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        //Button button = (Button) findViewById(R.id.button_close_poi_type_list);
-        //button.setOnClickListener(this);
-
-        _list_poi_type = new DbManager(this).queryPoiTypeList();
-        init();
 
         //Initializing NavigationView
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -65,7 +54,7 @@ public class PoiTypeListActivity extends AppCompatActivity
                                                                  switch (menuItem.getItemId()) {
                                                                      //Replacing the main content with ContentFragment Which is our Inbox View;
                                                                      case R.id.karte:
-                                                                         startMainActivity();
+                                                                         starMainActivity();
                                                                          return true;
 
                                                                      case R.id.list_route:
@@ -110,66 +99,7 @@ public class PoiTypeListActivity extends AppCompatActivity
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
     }
-
-    public void init() {
-
-        TableLayout table = (TableLayout) findViewById(R.id.displayPoiTypeList);
-        table.removeAllViews();
-
-        for (PoiType poiType : _list_poi_type) {
-            TableRow row = new TableRow(this);
-
-            row.addView(_create_text_view("<" + poiType.id() + ">"));
-            row.addView(_create_text_view(poiType.name()));
-            row.addView(_create_check_box(poiType));
-            table.addView(row);
-
-        }
-    }
-
-
-    public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-        PoiType poiType = (PoiType)button.getTag();
-
-        if(button.isChecked() && !poiType.is_visible()) {
-            poiType.show();
-            new DbManager(this).update(poiType);
-        }
-        else if (!button.isChecked() && poiType.is_visible()) {
-            poiType.hide();
-            new DbManager(this).update(poiType);
-        }
-    }
-
-    public void onClick(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
-
-    private TextView _create_text_view(int val) {
-        TextView view = new TextView(this);
-        view.setText(Integer.toString(val));
-
-        return view;
-    }
-
-    private TextView _create_text_view(String text) {
-        TextView view = new TextView(this);
-        view.setText(text);
-
-        return view;
-    }
-
-    private CheckBox _create_check_box(PoiType poiType) {
-        CheckBox checkBox = new CheckBox(this);
-        checkBox.setOnCheckedChangeListener(this);
-        checkBox.setTag(poiType);
-        checkBox.setChecked(poiType.is_visible());
-
-        return checkBox;
-    }
-
-    public void startMainActivity() {
+    public void starMainActivity() {
         startActivity(new Intent(this, MainActivity.class));
     }
     public void startListRouteActivity() {
@@ -182,4 +112,5 @@ public class PoiTypeListActivity extends AppCompatActivity
     public void startSearchPoiActivity() {
         startActivity(new Intent(this, SearchActivity.class));
     }
+
 }

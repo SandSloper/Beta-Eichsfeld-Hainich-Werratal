@@ -11,12 +11,26 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:weightSum="1">
         <include
             android:id="@+id/toolbar"
             layout="@layout/tool_bar"
             />
-        <include layout="@layout/content_poi_type_list" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/suchtext"
+            android:text="Bitte geben Sie den Suchtext ein"/>
+
+        <ImageButton
+            android:layout_width="60px"
+            android:layout_height="60px"
+            android:id="@+id/imageButton"
+            android:layout_margin="35px"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/search"/>
 
     </LinearLayout>
 
@@ -29,5 +43,3 @@
         app:menu="@menu/drawer"
         />
 </android.support.v4.widget.DrawerLayout>
-
-
