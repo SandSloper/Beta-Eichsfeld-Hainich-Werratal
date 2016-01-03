@@ -18,19 +18,8 @@
             layout="@layout/tool_bar"
             />
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/suchtext"
-            android:text="Bitte geben Sie den Suchtext ein"/>
+        <include layout="@layout/content_search" />
 
-        <ImageButton
-            android:layout_width="60px"
-            android:layout_height="60px"
-            android:id="@+id/imageButton"
-            android:layout_margin="35px"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/search"/>
 
     </LinearLayout>
 

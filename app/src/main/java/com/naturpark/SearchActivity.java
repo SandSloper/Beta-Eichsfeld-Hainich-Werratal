@@ -10,21 +10,57 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * Created by Loren on 30.12.2015.
  */
+
 public class SearchActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
-    @Override
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
+    private DbManager mDbManager;
+
+
+     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.search);
 
+         mDbManager = new DbManager(this);
+         mDbManager.open();
+         final EditText SEdit = (EditText)findViewById(R.id.suchtext);
+         final TextView tvResults = (TextView) findViewById(R.id.tvResults);
+         ImageButton SButton = (ImageButton)findViewById(R.id.SearchButton);
+         SButton.setOnClickListener(new View.OnClickListener(){;
+
+            public void onClick(View v) {
+                LinkedList<String> results = mDbManager.search(SEdit.getText().toString());
+
+                if (results.isEmpty()) {
+                    tvResults.setText("No results found");
+                } else {
+                    Iterator<String> i = results.iterator();
+                    tvResults.setText("");
+                    while (i.hasNext()) {
+                        tvResults.setText(tvResults.getText() + i.next() + "\n");
+                    }
+                }
+            }
+            });
+
+
         DrawerLayout drawerLayout = (DrawerLayout)findViewById(R.id.drawer);
+
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -56,4 +92,22 @@ public class SearchActivity extends AppCompatActivity {
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
     }
+
+    public void starMainActivity() {
+        startActivity(new Intent(this, MainActivity.class));
+    }
+    public void startListRouteActivity() {
+        startActivity(new Intent(this, RouteListActivity.class));
+    }
+
+    public void startListPoiTypeActivity() {
+        startActivity(new Intent(this, PoiTypeListActivity.class));
+    }
+    public void startSearchPoiActivity() {
+        startActivity(new Intent(this, SearchActivity.class));
+    }
+
 }
+
+
+

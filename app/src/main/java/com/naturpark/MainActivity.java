@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.naturpark.data.Obstacle;
@@ -25,6 +26,7 @@ import com.naturpark.data.PoiType;
 import com.naturpark.data.Route;
 
 import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
@@ -76,45 +78,10 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         }
     }
 
-    public class ResourceProxyImpl extends DefaultResourceProxyImpl {
+    ImageButton btnShowLocation;
 
-        private final Context mContext;
-
-        public ResourceProxyImpl(final Context pContext) {
-            super(pContext);
-            mContext = pContext;
-        }
-
-        @Override
-        public String getString(final string pResId) {
-            try {
-                final int res = R.string.class.getDeclaredField(pResId.name()).getInt(null);
-                return mContext.getString(res);
-            } catch (final Exception e) {
-                return super.getString(pResId);
-            }
-        }
-
-        @Override
-        public Bitmap getBitmap(final bitmap pResId) {
-            try {
-                final int res = R.drawable.class.getDeclaredField(pResId.name()).getInt(null);
-                return BitmapFactory.decodeResource(mContext.getResources(), res);
-            } catch (final Exception e) {
-                return super.getBitmap(pResId);
-            }
-        }
-
-        @Override
-        public Drawable getDrawable(final bitmap pResId) {
-            try {
-                final int res = R.drawable.class.getDeclaredField(pResId.name()).getInt(null);
-                return mContext.getResources().getDrawable(res);
-            } catch (final Exception e) {
-                return super.getDrawable(pResId);
-            }
-        }
-    }
+    // GPSTracker class
+    GPSTracker gps;
 
     private boolean _creating;
     private SharedPreferences _preferences;
@@ -142,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
         setContentView(R.layout.activity_main);
 
-        map = (MapView) findViewById(R.id.mapview);
+        map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
         map.getController().setZoom(_preferences.getInt("ZoomLevel", 10));
         map.getController().setCenter(new GeoPoint(_preferences.getFloat("Latitude", (float) 51.080414), _preferences.getFloat("Longitude", (float)10.434239)));
@@ -151,6 +118,40 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         map.setUseDataConnection(true);
         map.addOnLayoutChangeListener(this);
 
+        btnShowLocation = (ImageButton) findViewById(R.id.GPSbutton);
+
+        // show location button click event
+        btnShowLocation.setOnClickListener(new View.OnClickListener() {
+
+                                               @Override
+                                               public void onClick(View view) {
+
+
+                                                   GPSTracker gps = new GPSTracker(MainActivity.this);
+                                                   // check if GPS enabled
+                                                   if (gps.canGetLocation()) {
+
+                                                       double latitude = gps.getLatitude();
+                                                       double longitude = gps.getLongitude();
+
+                                                       map.getController().setCenter(new GeoPoint(latitude, longitude));
+                                                       map.getController().setZoom(15);
+                                                       GeoPoint defaultPoint = new GeoPoint(latitude, longitude);
+                                                       map.getController().animateTo(defaultPoint);
+                                                       Marker startMarker = new Marker(map);
+                                                       startMarker.setPosition(new GeoPoint(latitude, longitude));
+                                                       startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                                                       startMarker.setIcon(getResources().getDrawable(R.drawable.location));
+                                                       startMarker.setTitle("Lat" + gps.getLatitude() + "Lon" + gps.getLongitude());
+                                                       map.getOverlays().add(startMarker);
+
+
+                                                   } else {
+                                                                                                              
+                                                       gps.showSettingsAlert();
+                                                   }
+                                               }
+                                           });
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -282,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             }
         };
 
-        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, gestureListener, new ResourceProxyImpl(this)));
+        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, gestureListener, new CustomResourceProxy(this)));
     }
 
     private void _addObstaclesToMap(MapView map) {
@@ -323,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             }
         };
 
-        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, gestureListener, new ResourceProxyImpl(this)));
+        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, gestureListener, new CustomResourceProxy(this)));
     }
 
     private void _addRoutesToMap(MapView map) {
@@ -361,4 +362,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
         return null;
     }
+
+
 }

@@ -11,11 +11,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.util.Log;
 
-import com.naturpark.data.Route;
 import com.naturpark.data.Obstacle;
-import com.naturpark.data.PoiType;
 import com.naturpark.data.Poi;
+import com.naturpark.data.PoiType;
+import com.naturpark.data.Route;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,18 +24,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import com.naturpark.data.Route;
-import com.naturpark.data.Obstacle;
-import com.naturpark.data.Poi;
 
 public class DbManager extends SQLiteOpenHelper {
     private static String DB_PATH;
     private static String DB_PATH_PREFIX = "/data/data/";
     private static String DB_PATH_SUFFIX = "/databases/";
+
+    private static final String TABLE_NAME = "poi";
 
     private SQLiteDatabase _database;
 
@@ -244,4 +242,40 @@ public class DbManager extends SQLiteOpenHelper {
             System.out.println("SQLException:" + e.getMessage());
         }
     }
+
+    public LinkedList<String> search(String search) {
+
+        LinkedList<String> results = new LinkedList<String>();
+        Cursor cursor = null;
+        try{
+            cursor = this._database.query(true, TABLE_NAME, new String[] { "type", "name","latitude","longitude","classification" }, TABLE_NAME + " MATCH ?", new String[] { search }, null, null, null, null);
+
+            if(cursor!=null && cursor.getCount()>0 && cursor.moveToFirst()){
+                int poitype = cursor.getColumnIndex("type");
+                int poiname = cursor.getColumnIndex("name");
+                int poilatitude = cursor.getColumnIndex("latitude");
+                int poilongitude = cursor.getColumnIndex("longitude");
+                int poiclassification = cursor.getColumnIndex("classification");
+
+                do{
+                    results.add(
+                            new String(
+                                    "type: "+cursor.getString(poitype) +
+                                            ", name: "+cursor.getString(poitype) +
+                                            ", classification: "+cursor.getString(poiclassification)
+                            )
+                    );
+                }while(cursor.moveToNext());
+            }
+        }catch(Exception e){
+            Log.e("Naturpark Hainich", "An error occurred while searching for " + search + ": " + e.toString(), e);
+        }finally{
+            if(cursor!=null && !cursor.isClosed()){
+                cursor.close();
+            }
+        }
+
+        return results;
+    }
+
 }
