@@ -35,13 +35,6 @@
         android:layout_height="wrap_content"
         android:onClick="onClickHeaderRating"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="Close"
-        android:id="@+id/button_close_route_list"/>
-
     </LinearLayout>
 
     <ScrollView

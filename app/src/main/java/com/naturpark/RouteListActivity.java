@@ -51,9 +51,6 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Button button = (Button) findViewById(R.id.button_close_route_list);
-        //button.setOnClickListener(this);
-
         _region = "";
         _length_min = 0;
         _length_max = 0;
@@ -63,53 +60,14 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         _list_obstacle = new DbManager(this).queryObstacleList();
         init();
 
+        // Initializing Drawer Layout and ActionBarToggle
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+
         //Initializing NavigationView
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
         //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener()
-
-                                                         {
-
-                                                             // This method will trigger on item Click of navigation menu
-                                                             @Override
-                                                             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                                                                 System.out.println("xxxxxxxxxxxxxx" + menuItem.getItemId());
-                                                                 //Checking if the item is in checked state or not, if not make it in checked state
-                                                                 if (menuItem.isChecked())
-                                                                     menuItem.setChecked(false);
-                                                                 else menuItem.setChecked(true);
-                                                                 //Closing drawer on item click
-                                                                 drawerLayout.closeDrawers();
-                                                                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
-                                                                 //Check to see which item was being clicked and perform appropriate action
-                                                                 switch (menuItem.getItemId()) {
-                                                                     //Replacing the main content with ContentFragment Which is our Inbox View;
-                                                                     case R.id.karte:
-                                                                         startMainActivity();
-                                                                         return true;
-
-                                                                     case R.id.list_route:
-                                                                         startListRouteActivity();
-                                                                         return true;
-
-                                                                     case R.id.list_poi_type:
-                                                                         startListPoiTypeActivity();
-                                                                         return true;
-                                                                     case R.id.search:
-                                                                         startSearchPoiActivity();
-                                                                         return true;
-
-                                                                     default:
-                                                                         // fehlt noch.....
-                                                                         return true;
-                                                                 }
-                                                             }
-                                                         }
-        );
-
-        // Initializing Drawer Layout and ActionBarToggle
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        navigationView.setNavigationItemSelectedListener(new NavigationViewListener(this, drawerLayout));
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer) {
 
@@ -402,18 +360,5 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
             default:
                 return Color.GRAY;
         }
-    }
-
-    public void startMainActivity() {
-        startActivity(new Intent(this, MainActivity.class));
-    }
-    public void startListRouteActivity() {
-        startActivity(new Intent(this, RouteListActivity.class));
-    }
-    public void startListPoiTypeActivity() {
-        startActivity(new Intent(this, PoiTypeListActivity.class));
-    }
-    public void startSearchPoiActivity() {
-        startActivity(new Intent(this, SearchActivity.class));
     }
 }
