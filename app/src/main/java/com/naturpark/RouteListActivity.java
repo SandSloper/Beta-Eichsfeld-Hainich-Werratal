@@ -13,11 +13,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.naturpark.data.Obstacle;
 import com.naturpark.data.Route;
 
 import java.util.ArrayList;
@@ -26,6 +30,7 @@ import java.util.List;
 public class RouteListActivity extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     private List<Route> _list_route;
+    private List<Obstacle> _list_obstacle;
 
     private int _popup_menu_id;
     // used for filtering
@@ -55,6 +60,7 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         _rating = 0;
         _sort_by_name = false;
         _list_route = new DbManager(this).queryRouteList();
+        _list_obstacle = new DbManager(this).queryObstacleList();
         init();
 
         //Initializing NavigationView
@@ -130,21 +136,15 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
     public void onClick(View view) {
 
 
-       /* Wird eigentlich durch den Nav drawer nicht mehr gebraucht
-       if (view.getId() == R.id.button_close_route_list) {
-            startActivity(new Intent(this, MainActivity.class));
-            return;
-        }*/
-
         view.setBackgroundColor(Color.GRAY);
 
-        TableRow tablerow = (TableRow)view;
-        TextView textView = (TextView) tablerow.getChildAt(0);
-        Integer route_id = Integer.parseInt(textView.getText().toString());
-        System.out.print("Seleceted Route ID:" + route_id);
+        //RelativeLayout layout = (RelativeLayout)view;
+        //TextView textView = (TextView) tablerow.getChildAt(0);
+        //Integer route_id = Integer.parseInt(textView.getText().toString());
+        System.out.print("Seleceted Route ID:" + view.getId());
 
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("Route", route_id);
+        intent.putExtra("Route", view.getId());
         startActivity(intent);
     }
 
@@ -240,8 +240,8 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void init() {
-        TableLayout table = (TableLayout) findViewById(R.id.displayLinear);
-        table.removeAllViews();
+        LinearLayout list = (LinearLayout) findViewById(R.id.layout_route);
+        list.removeAllViews();
 
         System.out.println("route size:%d\n" + _list_route.size());
         for (Route route : _list_route) {
@@ -255,46 +255,95 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
             if ((_rating != 0) && (route.rating() != _rating))
                 continue;
 
-            TableRow row = new TableRow(this);
+            if (route != _list_route.get(0)) {
+                ImageView divider = new ImageView(this);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 5);
+                params.setMargins(2, 2, 2, 2);
+                divider.setLayoutParams(params);
+                divider.setBackgroundColor(Color.BLACK);
+                list.addView(divider);
+            }
+
+            RelativeLayout row = new RelativeLayout(this);
+            row.setId(route.id());
             row.setClickable(true);
             row.setOnClickListener(this);
 
-            row.addView(_create_text_view(route.id(), false));
-            row.addView(_create_text_view(route.region()));
-            row.addView(_create_text_view(route.name()));
-            row.addView(_create_text_view(route.length()));
-            row.addView(_create_text_view(route.rating(), true));
-            table.addView(row);
+            {
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_LEFT);
+                params.addRule(RelativeLayout.ALIGN_TOP);
+                row.addView(_create_text_view(1, route.name(), 18), params);
+            }
+            {
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_LEFT);
+                params.addRule(RelativeLayout.BELOW, 1);
+                row.addView(_create_text_view(2, route.region(), 16), params);
+            }
+            {
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                params.addRule(RelativeLayout.BELOW, 1);
+                row.addView(_create_text_view(3, "" + route.length() + " km", 16), params);
+            }
+            {
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                params.addRule(RelativeLayout.BELOW, 2);
+                row.addView(_create_text_view(4, ""+_get_quality_text(route.quality())+":", 14, _get_quality_color(route.quality())), params);
+
+            }
+            {
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                params.addRule(RelativeLayout.BELOW, 2);
+                row.addView(_create_text_view(5, ""+route.slope_avg() + "%/" + route.slope_max() + "%", 14), params);
+            }
+            {
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                params.addRule(RelativeLayout.RIGHT_OF, 4);
+                params.addRule(RelativeLayout.LEFT_OF, 5);
+                params.addRule(RelativeLayout.BELOW, 2);
+                row.addView(_create_text_view(6, "" + _get_obstacles(route.id()), 14), params);
+            }
+
+            list.addView(row);
         }
     }
 
 
-    private TextView _create_text_view(int val, boolean visible) {
+    private TextView _create_text_view(int id, String text, int text_size) {
+
         TextView view = new TextView(this);
-        view.setText(Integer.toString(val));
-        if (!visible)
-            view.setVisibility(View.INVISIBLE);
-
-        return view;
-    }
-
-
-    private TextView _create_text_view(float val) {
-        TextView view = new TextView(this);
-        view.setText(Float.toString(val));
-        view.setTextSize(18);
-
-        return view;
-    }
-
-
-    private TextView _create_text_view(String text) {
-        TextView view = new TextView(this);
+        view.setId(id);
         view.setText(text);
-        view.setTextSize(18);
+        view.setTextSize(text_size);
 
         return view;
     }
+
+    private TextView _create_text_view(int id, String text, int text_size, int color) {
+
+        TextView view = new TextView(this);
+        view.setId(id);
+        view.setText(text);
+        view.setTextSize(text_size);
+        view.setTextColor(color);
+
+        return view;
+    }
+
+    private RelativeLayout.LayoutParams _create_params(int[] rules) {
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+        for (int rule : rules)
+        params.addRule(rule);
+
+        return params;
+    }
+
 
     private boolean _is_in_list(ArrayList list, String text) {
         for (int i = 0; i < list.size(); ++i) {
@@ -316,13 +365,51 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
 
         return list;
     }
+
+    private int _get_obstacles(int id) {
+        int num = 0;
+
+        for (Obstacle obstacle : _list_obstacle) {
+            if (obstacle.route_id() == id)
+                ++num;
+        }
+
+        return num;
+    }
+
+    private String _get_quality_text(int quality)
+    {
+        switch (quality) {
+            case 1:
+                return "Ungeeignet";
+            case 2:
+                return "Bedingt";
+            case 3:
+                return "Geeugnet";
+            default:
+                return "Unbekannt";
+        }
+    }
+
+    private int _get_quality_color(int quality) {
+        switch (quality) {
+            case 1:
+                return Color.RED;
+            case 2:
+                return Color.YELLOW;
+            case 3:
+                return Color.GREEN;
+            default:
+                return Color.GRAY;
+        }
+    }
+
     public void startMainActivity() {
         startActivity(new Intent(this, MainActivity.class));
     }
     public void startListRouteActivity() {
         startActivity(new Intent(this, RouteListActivity.class));
     }
-
     public void startListPoiTypeActivity() {
         startActivity(new Intent(this, PoiTypeListActivity.class));
     }

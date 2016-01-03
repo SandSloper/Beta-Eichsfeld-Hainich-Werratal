@@ -6,91 +6,56 @@
     android:paddingRight="16dp"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textview_search"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:editable="true"
-        android:text="Search"/>
+        android:orientation="horizontal">
 
-   <!-- wird eigentlich icht mehr gebraucht
+    <Button android:text="R"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickHeaderRegion"/>
+
+    <Button android:text="N"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickHeaderName"/>
+
+    <Button android:text="L"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickHeaderLength"/>
+
+    <Button android:text="S"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button android:text="Q"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="onClickHeaderRating"/>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:text="Close"
         android:id="@+id/button_close_route_list"/>
-    -->
 
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    </LinearLayout>
+
+    <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        android:orientation="vertical">
 
-
-        <TableRow>
-            <TextView android:text="Id"
-                android:layout_width="0dp"
-                android:layout_column="0"
-                android:layout_weight="0"/>
-
-            <Button android:text="Region"
-                android:layout_width="60dp"
-                android:layout_column="1"
-                android:layout_weight="1"
-                android:onClick="onClickHeaderRegion"/>
-
-            <Button android:text="Name"
-                android:layout_width="30dp"
-                android:layout_column="2"
-                android:layout_weight="1"
-                android:onClick="onClickHeaderName"/>
-
-            <Button android:text="Länge"
-                android:layout_width="30dp"
-                android:layout_column="3"
-                android:layout_weight="1"
-                android:onClick="onClickHeaderLength"/>
-
-            <Button android:text="Steigung"
-                android:layout_width="10dp"
-                android:layout_column="4"
-                android:layout_weight="1"/>
-
-            <Button android:text="Einstufung"
-                android:layout_width="10dp"
-                android:layout_column="5"
-                android:layout_weight="1"
-                android:onClick="onClickHeaderRating"/>
-        </TableRow>
-
-        <ScrollView
+        <LinearLayout
+            android:id="@+id/layout_route"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:scrollbars="vertical"
-            android:layout_weight="1">
+            android:orientation="vertical">
 
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/displayLinear"
-            android:orientation="vertical"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:isScrollContainer="true">
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/display_row_route"
-                android:layout_marginTop="280dip">
-            </TableRow>
-
-        </TableLayout>
-
-        </ScrollView>
-
-    </TableLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
