@@ -7,12 +7,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
 
-import com.naturpark.R;
-import com.naturpark.MainActivity;
-import com.naturpark.PoiTypeListActivity;
-import com.naturpark.RouteListActivity;
-import com.naturpark.SearchActivity;
-
 /**
  * Created by frenzel on 1/3/16.
  */

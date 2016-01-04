@@ -1,13 +1,7 @@
 package com.naturpark;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -15,7 +9,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -25,7 +18,6 @@ import com.naturpark.data.Poi;
 import com.naturpark.data.PoiType;
 import com.naturpark.data.Route;
 
-import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -78,8 +70,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         }
     }
 
-    ImageButton btnShowLocation;
-
     // GPSTracker class
     GPSTracker gps;
 
@@ -107,51 +97,21 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         _creating = true;
         _preferences = getSharedPreferences("naturpark.prf", MODE_PRIVATE);
 
+        GPSManager gps = new GPSManager(
+                MainActivity.this);
+        gps.start();
+
         setContentView(R.layout.activity_main);
 
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
         map.getController().setZoom(_preferences.getInt("ZoomLevel", 10));
-        map.getController().setCenter(new GeoPoint(_preferences.getFloat("Latitude", (float) 51.080414), _preferences.getFloat("Longitude", (float)10.434239)));
+        map.getController().setCenter(new GeoPoint(_preferences.getFloat("Latitude", (float) 51.080414), _preferences.getFloat("Longitude", (float) 10.434239)));
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
         map.addOnLayoutChangeListener(this);
 
-        btnShowLocation = (ImageButton) findViewById(R.id.GPSbutton);
-
-        // show location button click event
-        btnShowLocation.setOnClickListener(new View.OnClickListener() {
-
-                                               @Override
-                                               public void onClick(View view) {
-
-
-                                                   GPSTracker gps = new GPSTracker(MainActivity.this);
-                                                   // check if GPS enabled
-                                                   if (gps.canGetLocation()) {
-
-                                                       double latitude = gps.getLatitude();
-                                                       double longitude = gps.getLongitude();
-
-                                                       map.getController().setCenter(new GeoPoint(latitude, longitude));
-                                                       map.getController().setZoom(15);
-                                                       GeoPoint defaultPoint = new GeoPoint(latitude, longitude);
-                                                       map.getController().animateTo(defaultPoint);
-                                                       Marker startMarker = new Marker(map);
-                                                       startMarker.setPosition(new GeoPoint(latitude, longitude));
-                                                       startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                                                       startMarker.setIcon(getResources().getDrawable(R.drawable.location));
-                                                       startMarker.setTitle("Lat" + gps.getLatitude() + "Lon" + gps.getLongitude());
-                                                       map.getOverlays().add(startMarker);
-
-
-                                                   } else {
-                                                                                                              
-                                                       gps.showSettingsAlert();
-                                                   }
-                                               }
-                                           });
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -361,6 +321,32 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         }
 
         return null;
+    }
+
+    public void onClickgetLocation (View view){
+
+        GPSTracker gpst = new GPSTracker(MainActivity.this);
+        // check if GPS enabled
+        if (gpst.canGetLocation()) {
+
+            double latitude = gpst.getLatitude();
+            double longitude = gpst.getLongitude();
+
+            map.getController().setCenter(new GeoPoint(latitude, longitude));
+            map.getController().setZoom(15);
+            GeoPoint defaultPoint = new GeoPoint(latitude, longitude);
+            map.getController().animateTo(defaultPoint);
+            Marker startMarker = new Marker(map);
+            startMarker.setPosition(new GeoPoint(latitude, longitude));
+            startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            startMarker.setIcon(getResources().getDrawable(R.drawable.location));
+            startMarker.setTitle("Lat" + gpst.getLatitude() + "Lon" + gpst.getLongitude());
+            map.getOverlays().add(startMarker);
+
+
+        } else {
+            gpst.stopUsingGPS();
+        }
     }
 
 
