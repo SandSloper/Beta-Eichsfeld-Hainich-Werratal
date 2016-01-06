@@ -2,7 +2,6 @@ package com.naturpark;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -10,7 +9,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.naturpark.data.Obstacle;
@@ -23,6 +21,7 @@ import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
@@ -68,6 +67,13 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             map.zoomToBoundingBox(_get_route(_route_id).boundingBox(this));
             _route_id = 0;
         }
+
+        // TODO: muss noch gefixt werden, irgendwie eine Boundingbox erschaffen
+        /*
+        if (_poi_id != 0 && map.getWidth() != 0) {
+            this.map.zoomToBoundingBox(bBox);
+            _poi_id = 0;
+        }*/
     }
 
     // GPSTracker class
@@ -81,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
-    private LocationManager locationManager;
+    private GeoPoint poi_point;
 
     private List<Route> _list_route;
     private List<PoiType> _list_poi_type;
@@ -89,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     private List<Obstacle> _list_obstacle;
 
     int _route_id;
+    int _poi_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,12 +112,25 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
+
         map.getController().setZoom(_preferences.getInt("ZoomLevel", 10));
         map.getController().setCenter(new GeoPoint(_preferences.getFloat("Latitude", (float) 51.080414), _preferences.getFloat("Longitude", (float) 10.434239)));
+
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
         map.addOnLayoutChangeListener(this);
+
+        // TODO: muss noch gefixt werden, irgendwie eine Boundingbox erschaffen, Parameter eventuell richtig einsetzen
+        /*_poi_id = getIntent().getIntExtra("ID", 0);
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:poi:" + _poi_id);
+
+        double north = getIntent().getIntExtra("Lat", 0);
+        double east  =  getIntent().getIntExtra("Lon", 0);
+        double south = getIntent().getIntExtra("Lat", 0);
+        double west  =  getIntent().getIntExtra("Lon", 0);
+
+        bBox = new BoundingBoxE6(north, east, south, west);*/
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -153,6 +173,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         _route_id = getIntent().getIntExtra("Route", 0);
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:route:" + _route_id);
 
+        _poi_id = getIntent().getIntExtra("Id",0);
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:poi:" + _poi_id);
 
         DbManager dbManager = new DbManager(this, _creating);
         _creating = false;
@@ -348,6 +370,5 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             gpst.stopUsingGPS();
         }
     }
-
 
 }

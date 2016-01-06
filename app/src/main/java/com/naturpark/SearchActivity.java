@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,6 +18,7 @@ import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -128,20 +130,33 @@ public class SearchActivity extends AppCompatActivity {
                 // Get the cursor, positioned to the corresponding row in the result set
                 Cursor cursor = (Cursor) listView.getItemAtPosition(position);
 
-                // Get the state's capital from this row in the database.
                 String poiName =
                         cursor.getString(cursor.getColumnIndexOrThrow("name"));
                 Toast.makeText(getApplicationContext(),
                         poiName, Toast.LENGTH_SHORT).show();
 
+                // Get the state's capital from this row in the database.
+                String poiId =
+                        cursor.getString(cursor.getColumnIndexOrThrow("_id"));
+
+                String poiLatitude =
+                        cursor.getString(cursor.getColumnIndexOrThrow("latitude"));
+
+                String poiLongitude =
+                        cursor.getString(cursor.getColumnIndexOrThrow("longitude"));
+
+                double lat = Double.parseDouble(poiLatitude);
+                double lon = Double.parseDouble(poiLongitude);
+                int _id = Integer.parseInt(poiId);
+
                 view.setBackgroundColor(Color.GRAY);
 
-                System.out.print("Seleceted Route ID:" + view.getId());
+                System.out.print("Seleceted Poi ID:" + view.getId());
 
                 Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                intent.putExtra("Poi", view.getId());
-                intent.putExtra("Latitude",dbHelper.fetchAllPoi().getColumnIndex("latitude"));
-                System.out.print("Seleceted POI LAT:" +dbHelper.fetchAllPoi().getColumnIndex("latitude"));
+                intent.putExtra("Lat", lat);
+                intent.putExtra("Lon", lon);
+                intent.putExtra("ID", _id);
                 startActivity(intent);
 
             }

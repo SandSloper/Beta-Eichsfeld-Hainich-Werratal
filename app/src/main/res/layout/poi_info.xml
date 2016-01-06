@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginBottom="30px"
         android:text="Name: "
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="#000"
@@ -29,6 +30,7 @@
 
     <TextView
         android:id="@+id/textView3"
+        android:layout_marginTop="15px"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView2"
@@ -85,7 +87,12 @@
         android:layout_above="@+id/textView2"
         android:layout_alignLeft="@+id/typ"
         android:text="Name"
-        android:textColor="#3300FF"/>
+        android:textColor="#3300FF"
+        android:lines="4"
+        android:maxLines="4"
+        android:layout_marginBottom="20px"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/lat"
