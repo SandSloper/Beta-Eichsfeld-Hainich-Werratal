@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
-import android.util.Log;
 
 import com.naturpark.data.Obstacle;
 import com.naturpark.data.Poi;
@@ -24,13 +23,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class DbManager extends SQLiteOpenHelper {
     private static String DB_PATH;
     private static String DB_PATH_PREFIX = "/data/data/";
     private static String DB_PATH_SUFFIX = "/databases/";
+
+    public static final String KEY_ROWID = "_id";
+    public static final String KEY_TYPE = "type";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_KLASSIFIKATION = "classification";
+    public static final String KEY_LATITUDE = "latitude";
+    public static final String KEY_LONGITUDE = "longitude";
 
     private static final String TABLE_NAME = "poi";
     public static final String COLUMN_NAME = "name";
@@ -244,47 +249,37 @@ public class DbManager extends SQLiteOpenHelper {
         }
     }
 
-    public LinkedList<String> search(String search) {
+    public Cursor fetchPoiByName(String inputText) throws SQLException {
 
-        int type;
-        String name;
+        Cursor mCursor = null;
+        if (inputText == null || inputText.length() == 0) {
+            mCursor = _database.query(TABLE_NAME, new String[]{KEY_ROWID, "type",
+                            "name", "latitude", "longitude", "classification"},
+                    null, null, null, null, null, null);
 
-        LinkedList<String> results = new LinkedList<String>();
-        Cursor cursor = null;
-        try{
-            cursor = _database.query(TABLE_NAME, new String[] { "type","name","latitude","longitude","classification" }, "name" + "=?", new String[] {search}, null, null, null, null);
-
-            if(cursor!=null && cursor.getCount()>0 && cursor.moveToFirst()){
-                int poitype = cursor.getColumnIndex("type");
-                int poiname = cursor.getColumnIndex("name");
-                int poilatitude = cursor.getColumnIndex("latitude");
-                int poilongitude = cursor.getColumnIndex("longitude");
-                int poiclassification = cursor.getColumnIndex("classification");
-
-
-                do{
-                    results.add(
-                            new String(
-                                    "Typ: "+ cursor.getString(poitype) +
-                                            ", Name: "+cursor.getString(poiname) +
-                                            ", Klassifikation: "+cursor.getString(poiclassification) +
-                                            ", Latitude: " + cursor.getString(poilatitude) +
-                                            ", Longitude: " + cursor.getString(poilongitude)
-                            )
-                    );
-                    type = cursor.getInt(poitype);
-                    name = cursor.getString(poiname);
-                }while(cursor.moveToNext());
-            }
-        } catch (Exception e) {
-            Log.e("Naturpark Hainich", "An error occurred while searching for " + search + ": " + e.toString(), e);
-        }finally{
-            if(cursor!=null && !cursor.isClosed()){
-                cursor.close();
-            }
+        } else {
+            mCursor = _database.query(true, TABLE_NAME, new String[]{KEY_ROWID, "type",
+                            "name", "latitude", "longitude", "classification", "latitude", "longitude", "classification"},
+                    "name" + " like '%" + inputText + "%'", null,
+                    null, null, null, null, null);
         }
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return mCursor;
 
-        return results;
+    }
+
+    public Cursor fetchAllPoi() {
+
+        Cursor mCursor = _database.query(TABLE_NAME, new String[]{KEY_ROWID, "type",
+                        "name", "latitude", "longitude", "latitude", "longitude", "classification"},
+                null, null, null, null, null);
+
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return mCursor;
     }
 
 }

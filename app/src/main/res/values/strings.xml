@@ -10,4 +10,7 @@
     <string name="database">naturpark.db</string>
     <string name="title_activity_poi_type_list">POI Auswahl</string>
     <string name="title_activity_search">Suche</string>
+    <string name="search_label">Search</string>
+    <string name="search_hint">Search Names</string>
+    <string name="some_hint">Type here to filter&#8230;</string>
 </resources>

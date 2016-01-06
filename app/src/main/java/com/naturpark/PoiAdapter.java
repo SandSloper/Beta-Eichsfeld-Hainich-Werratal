@@ -4,34 +4,86 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import com.naturpark.data.Poi;
 
 import java.util.ArrayList;
 
-/**
- * Created by Loren on 04.01.2016.
- */
-public class PoiAdapter extends ArrayAdapter<Poi> {
 
-    public PoiAdapter(Context context, ArrayList<Poi> poi) {
-        super(context, 0, poi);
+/**
+ * Created by Loren on 06.01.2016.
+ */
+
+public class PoiAdapter extends BaseAdapter {
+
+    private ArrayList<String> mListItems;
+    private LayoutInflater mLayoutInflater;
+
+    public PoiAdapter(Context context, ArrayList<String> arrayList){
+
+        mListItems = arrayList;
+
+        //get the layout inflater
+        mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        // Get the data item for this position
-        Poi poi = getItem(position);
-        // Check if an existing view is being reused, otherwise inflate the view
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.view_search, parent, false);
-        }
-        // Lookup view for data population
-        TextView tvName = (TextView) convertView.findViewById(R.id.poiType);
-        TextView tvHome = (TextView) convertView.findViewById(R.id.poiName);
+    public int getCount() {
+        //getCount() represents how many items are in the list
+        return mListItems.size();
+    }
 
-        return convertView;
+    @Override
+    //get the data of an item from a specific position
+    //i represents the position of the item in the list
+    public Object getItem(int i) {
+        return null;
+    }
+
+    @Override
+    //get the position id of the item from the list
+    public long getItemId(int i) {
+        return 0;
+    }
+
+    @Override
+
+    public View getView(int position, View view, ViewGroup viewGroup) {
+
+        // create a ViewHolder reference
+        ViewHolder holder;
+
+        //check to see if the reused view is null or not, if is not null then reuse it
+        if (view == null) {
+            holder = new ViewHolder();
+
+            view = mLayoutInflater.inflate(R.layout.list_item, null);
+            holder.itemName = (TextView) view.findViewById(R.id.list_item_text_view);
+
+            // the setTag is used to store the data within this view
+            view.setTag(holder);
+        } else {
+            // the getTag returns the viewHolder object set as a tag to the view
+            holder = (ViewHolder)view.getTag();
+        }
+
+        //get the string item from the position "position" from array list to put it on the TextView
+        String stringItem = mListItems.get(position);
+        if (stringItem != null) {
+            if (holder.itemName != null) {
+                //set the item name on the TextView
+                holder.itemName.setText(stringItem);
+            }
+        }
+
+        //this method must return the view corresponding to the data at the specified position.
+        return view;
+
+    }
+
+    private static class ViewHolder {
+
+        protected TextView itemName;
+
     }
 }

@@ -20,7 +20,6 @@
 
         <include layout="@layout/content_search" />
 
-
     </LinearLayout>
 
     <android.support.design.widget.NavigationView
@@ -31,4 +30,5 @@
         app:headerLayout="@layout/header"
         app:menu="@menu/drawer"
         />
+
 </android.support.v4.widget.DrawerLayout>

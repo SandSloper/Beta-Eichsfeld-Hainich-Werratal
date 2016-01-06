@@ -7,6 +7,12 @@ import android.location.Location;
 
 public class Poi {
 
+    private int _type;
+    Location _location;
+    private String _name;
+    private String _address;
+    private int _classification;
+
     public Poi(int type, Location location, String name, String address, int classification)
     {
         _type = type;
@@ -22,9 +28,4 @@ public class Poi {
     public String address() { return _address; }
     public int classification() { return _classification; }
 
-    private int _type;
-    Location _location;
-    private String _name;
-    private String _address;
-    private int _classification;
 }

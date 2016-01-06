@@ -14,7 +14,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Route implements Parcelable {
 

@@ -41,9 +41,6 @@ public class NavigationViewListener implements NavigationView.OnNavigationItemSe
                 startListRouteActivity();
                 return true;
 
-            case R.id.list_poi_type:
-                startListPoiTypeActivity();
-                return true;
             case R.id.search:
                 startSearchPoiActivity();
                 return true;
@@ -61,9 +58,7 @@ public class NavigationViewListener implements NavigationView.OnNavigationItemSe
     public void startListRouteActivity() {
         _activity.startActivity(new Intent(_activity, RouteListActivity.class));
     }
-    public void startListPoiTypeActivity() {
-        _activity.startActivity(new Intent(_activity, PoiTypeListActivity.class));
-    }
+
     public void startSearchPoiActivity() {
         _activity.startActivity(new Intent(_activity, SearchActivity.class));
     }

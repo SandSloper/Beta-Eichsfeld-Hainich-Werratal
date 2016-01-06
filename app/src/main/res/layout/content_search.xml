@@ -6,37 +6,13 @@
     android:paddingRight="16dp"
     android:orientation="vertical" >
 
+    <EditText android:id="@+id/myFilter" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:ems="10"
+        android:hint="@string/some_hint">
+        <requestFocus />
+    </EditText>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/suchtext"
-        />
-
-    <ImageButton
-        android:layout_width="60px"
-        android:layout_height="60px"
-        android:id="@+id/SearchButton"
-        android:layout_margin="35px"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/search"
-        android:onClick="onClickSearchPoiName"/>
-
-    <TextView
-        android:id="@+id/tvResults"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:text=""
-        android:singleLine="false"
-        />
-
-
-
-    <ListView
-        android:id="@+id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </ListView>
+    <ListView android:id="@+id/listView1" android:layout_width="fill_parent"
+        android:layout_height="fill_parent" />
 
 </LinearLayout>
