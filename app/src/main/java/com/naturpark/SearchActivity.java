@@ -132,33 +132,23 @@ public class SearchActivity extends AppCompatActivity {
 
                 String poiName =
                         cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                Toast.makeText(getApplicationContext(),
-                        poiName, Toast.LENGTH_SHORT).show();
 
                 // Get the state's capital from this row in the database.
-                String poiId =
-                        cursor.getString(cursor.getColumnIndexOrThrow("_id"));
-
                 String poiLatitude =
                         cursor.getString(cursor.getColumnIndexOrThrow("latitude"));
 
                 String poiLongitude =
                         cursor.getString(cursor.getColumnIndexOrThrow("longitude"));
 
-                double lat = Double.parseDouble(poiLatitude);
-                double lon = Double.parseDouble(poiLongitude);
-                int _id = Integer.parseInt(poiId);
-
                 view.setBackgroundColor(Color.GRAY);
 
                 System.out.print("Seleceted Poi ID:" + view.getId());
 
-                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                intent.putExtra("Lat", lat);
-                intent.putExtra("Lon", lon);
-                intent.putExtra("ID", _id);
+                Intent intent = new Intent(SearchActivity.this,ZoomToActivity.class);
+                intent.putExtra("Lat", poiLatitude);
+                intent.putExtra("Lon", poiLongitude);
+                intent.putExtra("Name",poiName);
                 startActivity(intent);
-
             }
         });
 

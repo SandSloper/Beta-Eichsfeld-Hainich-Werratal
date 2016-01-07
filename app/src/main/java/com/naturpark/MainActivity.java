@@ -1,7 +1,10 @@
 package com.naturpark;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -21,7 +24,6 @@ import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
@@ -30,6 +32,9 @@ import org.osmdroid.views.overlay.PathOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.naturpark.R.drawable.location;
+import static com.naturpark.R.drawable.poi_marker;
 
 public class MainActivity extends AppCompatActivity implements MapListener, View.OnLayoutChangeListener {
 
@@ -82,20 +87,17 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     private boolean _creating;
     private SharedPreferences _preferences;
 
-    private Toolbar toolbar;
-    private MapView map;
-    private NavigationView navigationView;
-    private DrawerLayout drawerLayout;
+    public Toolbar toolbar;
+    public MapView map;
+    public NavigationView navigationView;
+    public DrawerLayout drawerLayout;
 
-    private GeoPoint poi_point;
-
-    private List<Route> _list_route;
-    private List<PoiType> _list_poi_type;
-    private List<Poi> _list_poi;
-    private List<Obstacle> _list_obstacle;
+    public List<Route> _list_route;
+    public List<PoiType> _list_poi_type;
+    public List<Poi> _list_poi;
+    public List<Obstacle> _list_obstacle;
 
     int _route_id;
-    int _poi_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,8 +175,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         _route_id = getIntent().getIntExtra("Route", 0);
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:route:" + _route_id);
 
-        _poi_id = getIntent().getIntExtra("Id",0);
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:poi:" + _poi_id);
 
         DbManager dbManager = new DbManager(this, _creating);
         _creating = false;
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         return null;
     }
 
-    private void _addPoiToMap(MapView map) {
+    public void _addPoiToMap(MapView map) {
         ArrayList overlayItemArray = new ArrayList<OverlayItem>();
 
         for (Poi poi : _list_poi) {
@@ -349,8 +349,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
         GPSTracker gpst = new GPSTracker(MainActivity.this);
         // check if GPS enabled
-        if (gpst.canGetLocation()) {
 
+        if (gpst.canGetLocation()) {
             double latitude = gpst.getLatitude();
             double longitude = gpst.getLongitude();
 
@@ -361,14 +361,13 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             Marker startMarker = new Marker(map);
             startMarker.setPosition(new GeoPoint(latitude, longitude));
             startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            startMarker.setIcon(getResources().getDrawable(R.drawable.location));
-            startMarker.setTitle("Lat" + gpst.getLatitude() + "Lon" + gpst.getLongitude());
+            startMarker.setIcon(getResources().getDrawable(poi_marker));
+            startMarker.setTitle("Ihr Standort:" + " Lat: " + gpst.getLatitude() + " Lon: " + gpst.getLongitude());
             map.getOverlays().add(startMarker);
 
-
-        } else {
+        }
+        else {
             gpst.stopUsingGPS();
         }
     }
-
 }
