@@ -195,7 +195,7 @@ public class DbManager extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put("visible", poiType.is_visible());
         values.put("icon_name", poiType.iconName());
-        _database.update("Poi_type", values, "id=" + poiType.id(), null);
+         _database.update("Poi_type", values, "id=" + poiType.id(), null);
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -253,12 +253,12 @@ public class DbManager extends SQLiteOpenHelper {
         Cursor mCursor = null;
         if (inputText == null || inputText.length() == 0) {
             mCursor = _database.query(TABLE_NAME, new String[]{KEY_ROWID, "type",
-                            "name", "classification","info"},
+                            "name", "classification","latitude","longitude","info"},
                     null, null, null, null, null, null);
 
         } else {
             mCursor = _database.query(true, TABLE_NAME, new String[]{KEY_ROWID, "type",
-                            "name", "classification", "classification","info"},
+                            "name","latitude","longitude", "classification","info"},
                     "name" + " like '%" + inputText + "%'", null,
                     null, null, null, null, null);
         }
