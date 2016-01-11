@@ -31,11 +31,9 @@ public class DbManager extends SQLiteOpenHelper {
     private static String DB_PATH_SUFFIX = "/databases/";
 
     public static final String KEY_ROWID = "_id";
-    public static final String KEY_TYPE = "type";
     public static final String KEY_NAME = "name";
     public static final String KEY_KLASSIFIKATION = "classification";
-    public static final String KEY_LATITUDE = "latitude";
-    public static final String KEY_LONGITUDE = "longitude";
+    public static final String KEY_INFO = "info";
 
     private static final String TABLE_NAME = "poi";
     public static final String COLUMN_NAME = "name";
@@ -162,7 +160,7 @@ public class DbManager extends SQLiteOpenHelper {
         List<Poi> list_poi = new ArrayList<Poi>();
 
         try {
-            Cursor cursor = _database.rawQuery("SELECT type, latitude, longitude, name, address, classification FROM Poi;", null);
+            Cursor cursor = _database.rawQuery("SELECT type, latitude, longitude, name, address, classification,info FROM Poi;", null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
@@ -171,13 +169,14 @@ public class DbManager extends SQLiteOpenHelper {
                 double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
                 String name = cursor.getString(cursor.getColumnIndex("name"));
                 String address = cursor.getString(cursor.getColumnIndex("address"));
-                int classification = cursor.getInt(cursor.getColumnIndex("classification"));
+                String classification = cursor.getString(cursor.getColumnIndex("classification"));
+                String info = cursor.getString(cursor.getColumnIndex("info"));
 
                 Location location = new Location("database");
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
 
-                list_poi.add(new Poi(type, location, name, address, classification));
+                list_poi.add(new Poi(type, location, name, address, classification,info));
 
                 cursor.moveToNext();
             }
@@ -254,12 +253,12 @@ public class DbManager extends SQLiteOpenHelper {
         Cursor mCursor = null;
         if (inputText == null || inputText.length() == 0) {
             mCursor = _database.query(TABLE_NAME, new String[]{KEY_ROWID, "type",
-                            "name", "latitude", "longitude", "classification"},
+                            "name", "classification","info"},
                     null, null, null, null, null, null);
 
         } else {
             mCursor = _database.query(true, TABLE_NAME, new String[]{KEY_ROWID, "type",
-                            "name", "latitude", "longitude", "classification", "latitude", "longitude", "classification"},
+                            "name", "classification", "classification","info"},
                     "name" + " like '%" + inputText + "%'", null,
                     null, null, null, null, null);
         }
@@ -273,7 +272,7 @@ public class DbManager extends SQLiteOpenHelper {
     public Cursor fetchAllPoi() {
 
         Cursor mCursor = _database.query(TABLE_NAME, new String[]{KEY_ROWID, "type",
-                        "name", "latitude", "longitude", "latitude", "longitude", "classification"},
+                        "name", "latitude", "longitude", "latitude", "longitude", "classification","info"},
                 null, null, null, null, null);
 
         if (mCursor != null) {
@@ -281,5 +280,4 @@ public class DbManager extends SQLiteOpenHelper {
         }
         return mCursor;
     }
-
 }

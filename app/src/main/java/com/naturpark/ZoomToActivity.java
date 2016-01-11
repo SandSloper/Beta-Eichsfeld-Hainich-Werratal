@@ -21,7 +21,6 @@ public class ZoomToActivity extends MainActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         Intent it = getIntent();
 
         Bundle b = it.getExtras();

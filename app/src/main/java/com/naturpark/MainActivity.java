@@ -72,13 +72,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             map.zoomToBoundingBox(_get_route(_route_id).boundingBox(this));
             _route_id = 0;
         }
-
-        // TODO: muss noch gefixt werden, irgendwie eine Boundingbox erschaffen
-        /*
-        if (_poi_id != 0 && map.getWidth() != 0) {
-            this.map.zoomToBoundingBox(bBox);
-            _poi_id = 0;
-        }*/
     }
 
     // GPSTracker class
@@ -122,17 +115,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
         map.addOnLayoutChangeListener(this);
-
-        // TODO: muss noch gefixt werden, irgendwie eine Boundingbox erschaffen, Parameter eventuell richtig einsetzen
-        /*_poi_id = getIntent().getIntExtra("ID", 0);
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:poi:" + _poi_id);
-
-        double north = getIntent().getIntExtra("Lat", 0);
-        double east  =  getIntent().getIntExtra("Lon", 0);
-        double south = getIntent().getIntExtra("Lat", 0);
-        double west  =  getIntent().getIntExtra("Lon", 0);
-
-        bBox = new BoundingBoxE6(north, east, south, west);*/
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -239,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         ArrayList overlayItemArray = new ArrayList<OverlayItem>();
 
         for (Poi poi : _list_poi) {
-            OverlayItem item = new OverlayItem(poi.name(), poi.address(),
+            OverlayItem item = new OverlayItem(poi.name(), poi.info(),
                     new GeoPoint(poi.location().getLatitude(), poi.location().getLongitude()));
             PoiType poiType = _getPoiType(poi.type());
             if (poiType != null)
