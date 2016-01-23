@@ -165,6 +165,7 @@ public class DbManager extends SQLiteOpenHelper {
             Cursor cursor = _database.rawQuery("SELECT type, latitude, longitude, name, address, classification,info FROM Poi;", null);
             cursor.moveToFirst();
 
+            int id = 1;
             while (!cursor.isAfterLast()) {
                 int type = cursor.getInt(cursor.getColumnIndex("type"));
                 double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
@@ -178,7 +179,7 @@ public class DbManager extends SQLiteOpenHelper {
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
 
-                list_poi.add(new Poi(type, location, name, address, classification,info));
+                list_poi.add(new Poi(id++, type, location, name, address, classification,info));
 
                 cursor.moveToNext();
             }
