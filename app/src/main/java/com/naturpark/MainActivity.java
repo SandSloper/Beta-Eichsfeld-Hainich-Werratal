@@ -89,15 +89,18 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     private boolean _creating;
     private SharedPreferences _preferences;
 
-    public Toolbar toolbar;
-    public MapView map;
-    public NavigationView navigationView;
-    public DrawerLayout drawerLayout;
+    private Toolbar toolbar;
+    protected MapView map;
+    private NavigationView navigationView;
+    private DrawerLayout drawerLayout;
 
-    public List<Route> _list_route;
-    public List<PoiType> _list_poi_type;
-    public List<Poi> _list_poi;
-    public List<Obstacle> _list_obstacle;
+    private LocationManager locationManager;
+
+    private List<Route> _list_route;
+    private List<PoiType> _list_poi_type;
+    private List<Poi> _list_poi;
+    private List<Obstacle> _list_obstacle;
+
     int _route_id;
     private DbManager dbHelper;
 
@@ -280,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         return null;
     }
 
-    public void _addPoiToMap(MapView map) {
+    private void _addPoiToMap(MapView map) {
         ArrayList overlayItemArray = new ArrayList<OverlayItem>();
 
         for (Poi poi : _list_poi) {
@@ -337,9 +340,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
                     break;
                 case 6:
                     item.setMarker(getResources().getDrawable(R.drawable.marker_poller));
-                    break;
-                case 7:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_schranke));
                     break;
                 default:
                     item.setMarker(getResources().getDrawable(R.drawable.marker_default));
@@ -406,7 +406,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
         GPSTracker gpst = new GPSTracker(MainActivity.this);
         // check if GPS enabled
-
         if (gpst.canGetLocation()) {
             double latitude = gpst.getLatitude();
             double longitude = gpst.getLongitude();

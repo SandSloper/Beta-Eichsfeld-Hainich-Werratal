@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             layout="@layout/tool_bar"
             />
-        <include layout="@layout/content_poi_type_list" />
+        <include layout="@layout/content_poi_list" />
 
     </LinearLayout>
 
