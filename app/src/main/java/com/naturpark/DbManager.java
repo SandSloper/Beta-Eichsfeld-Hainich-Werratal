@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DbManager extends SQLiteOpenHelper {
@@ -202,9 +203,13 @@ public class DbManager extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
     }
 
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    @Override
+    public void onUpgrade(SQLiteDatabase database, int version_old, int current_version) {
+        String query;
+        query = "DROP TABLE IF EXISTS obstacle";
+        database.execSQL(query);
+        onCreate(database);
     }
-
     private void copy(Context context, boolean enforce_copy) throws IOException {
         InputStream assetsDB = context.getAssets().open(getDatabaseName());
         File file = new File(DB_PATH);
@@ -281,17 +286,15 @@ public class DbManager extends SQLiteOpenHelper {
         }
         return mCursor;
     }
-    public void insertObstacle(float latitude, float longitude, String name, int type)
+    public void insertObstacle(HashMap<String, String> queryValues)
     {
-        String query = "INSERT INTO obstacle (type,latitude,longitude,name) VALUES('"+type+"','"+name+"','"+latitude+"','"+longitude+"');";
-        _database.execSQL(query);
-    }
-    public boolean updateObstacle(float latitude, float longitude, String name, int type) {
-        ContentValues args = new ContentValues();
-        args.put("name", name);
-        args.put("latitude", latitude);
-        args.put("longitude", longitude);
-        args.put("type", type);
-        return _database.update("obstacle", args, "id" + "=", null) > 0;
+        _database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name", queryValues.get("name"));
+        values.put("type", queryValues.get("type"));
+        values.put("latitude", queryValues.get("latitude"));
+        values.put("longitude", queryValues.get("longitude"));
+        _database.insert("obstacle", null, values);
+        _database.close();
     }
 }

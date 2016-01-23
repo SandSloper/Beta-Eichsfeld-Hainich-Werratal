@@ -11,11 +11,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.naturpark.data.Obstacle;
@@ -23,13 +20,9 @@ import com.naturpark.data.Poi;
 import com.naturpark.data.PoiType;
 import com.naturpark.data.Route;
 
-import org.osmdroid.bonuspack.overlays.BasicInfoWindow;
-import org.osmdroid.bonuspack.overlays.GroundOverlay;
-import org.osmdroid.bonuspack.overlays.InfoWindow;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
-import org.osmdroid.bonuspack.overlays.Polygon;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
@@ -41,6 +34,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.naturpark.R.drawable.location;
@@ -100,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     public List<Obstacle> _list_obstacle;
     int _route_id;
     private DbManager dbHelper;
+    private int type;
+    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     //Handling Map events
     @Override
     public boolean singleTapConfirmedHelper(GeoPoint p) {
-        Toast.makeText(this, "Tap on (" + p.getLatitude() + "," + p.getLongitude() + ")", Toast.LENGTH_SHORT).show();
+
         return false;
     }
 
@@ -180,21 +176,61 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
         final float lat_f = (float) latitude;
         final float lon_f = (float) longitude;
-        final int type = 1;
+        final HashMap o_map = new HashMap();
 
-        String obstacle_types[] = new String[]{"Schranke", "Treppe", "Engstelle", "Stufe", "Rine", "Poller", "Abhang"};
+        String obstacle_types[] = new String[]{"Bitte wähöen","Schranke", "Treppe", "Engstelle", "Stufe", "Rinne", "Poller", "Abhang"};
         final Spinner obstacle_type_spinner = new Spinner(this);
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1, obstacle_types);
         obstacle_type_spinner.setAdapter(adapter);
 
         builder.setView(obstacle_type_spinner);
 
+        if (obstacle_type_spinner.getSelectedItem().toString() == "Schranke"){
+            type = 1;
+            o_map.put(type,"type");
+            o_map.put("Schranke","name");
+        }
+        if (obstacle_type_spinner.getSelectedItem().toString() == "Treppe"){
+            type = 2;
+            o_map.put(type,"type");
+            o_map.put("Treppe","name");
+        }
+        if (obstacle_type_spinner.getSelectedItem().toString() == "Engstelle"){
+            type = 3;
+            o_map.put(type,"type");
+            o_map.put("Engstelle","name");
+        }
+        if (obstacle_type_spinner.getSelectedItem().toString() == "Stufe"){
+            type = 4;
+            o_map.put(type,"type");
+            o_map.put("Stufe","name");
+        }
+        if (obstacle_type_spinner.getSelectedItem().toString() == "Rinne"){
+            type = 5;
+            o_map.put(type,"type");
+            o_map.put("Rinne","name");
+        }
+        if (obstacle_type_spinner.getSelectedItem().toString() == "Poller"){
+            type = 6;
+            o_map.put(type,"type");
+            o_map.put("Poller","name");
+        }
+        if (obstacle_type_spinner.getSelectedItem().toString() == "Abhang"){
+            type = 7;
+            o_map.put(type,"type");
+            o_map.put("Abhang","name");
+        }
+
+        o_map.put(lat_f,"latitude");
+        o_map.put(lon_f,"longitude");
+
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dbHelper.open();
-                dbHelper.insertObstacle(lat_f,lon_f,obstacle_type_spinner.getSelectedItem().toString(), type);
+                dbHelper.insertObstacle(o_map);
                 dbHelper.close();
+
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
