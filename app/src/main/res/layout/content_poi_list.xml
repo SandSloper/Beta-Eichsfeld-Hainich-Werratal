@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,7 +10,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
@@ -19,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="@dimen/abc_text_size_small_material"
-            android:text="x/100 ausgewählte Routen"/>
+            android:text="x/100 ausgewählte POIs"/>
 
         <ImageButton
             android:id="@+id/button_show_filter"
@@ -40,52 +41,13 @@
 
         <TableRow>
             <Button
-                android:text="Region"
+                android:text="Art"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:onClick="onClickHeaderRegion"/>
+                android:onClick="onClickHeaderType"/>
 
             <TextView
-                android:id="@+id/textview_region"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="alle"/>
-        </TableRow>
-
-        <TableRow>
-            <Button android:text="Länge"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:onClick="onClickHeaderLength"/>
-
-            <TextView
-                android:id="@+id/textview_length"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="alle"/>
-        </TableRow>
-
-        <TableRow>
-            <Button android:text="Qualität"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onClickHeaderQuality"/>
-
-            <TextView
-                android:id="@+id/textview_quality"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="alle"/>
-        </TableRow>
-
-        <TableRow>
-            <Button android:text="Steigung"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onClickHeaderGrade"/>
-
-            <TextView
-                android:id="@+id/textview_grade_avg"
+                android:id="@+id/textview_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="alle"/>
@@ -112,7 +74,7 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/layout_route"
+            android:id="@+id/layout_poi"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical"

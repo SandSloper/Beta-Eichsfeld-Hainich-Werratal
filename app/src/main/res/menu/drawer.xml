@@ -15,13 +15,11 @@
             android:icon="@drawable/route"
             android:title="Routen auswählen" />
 
-       <!-- Optional
         <item
             android:id="@+id/list_poi_type"
             android:checked="false"
             android:icon="@drawable/ic_three"
             android:title="POI auswählen" />
-            -->
         <item
             android:id="@+id/search"
             android:checked="false"
