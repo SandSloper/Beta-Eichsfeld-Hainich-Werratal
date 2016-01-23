@@ -3,10 +3,7 @@ package com.naturpark;
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.util.GeoPoint;
-
-import static com.naturpark.R.drawable.poi_marker;
 
 /**
  * Created by Loren on 07.01.2016.

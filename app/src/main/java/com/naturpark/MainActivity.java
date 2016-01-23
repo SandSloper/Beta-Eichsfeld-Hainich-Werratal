@@ -1,17 +1,21 @@
 package com.naturpark;
 
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.naturpark.data.Obstacle;
@@ -19,7 +23,13 @@ import com.naturpark.data.Poi;
 import com.naturpark.data.PoiType;
 import com.naturpark.data.Route;
 
+import org.osmdroid.bonuspack.overlays.BasicInfoWindow;
+import org.osmdroid.bonuspack.overlays.GroundOverlay;
+import org.osmdroid.bonuspack.overlays.InfoWindow;
+import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
+import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Polygon;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
 import org.osmdroid.events.ZoomEvent;
@@ -34,9 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.naturpark.R.drawable.location;
-import static com.naturpark.R.drawable.poi_marker;
 
-public class MainActivity extends AppCompatActivity implements MapListener, View.OnLayoutChangeListener {
+public class MainActivity extends AppCompatActivity implements MapListener, View.OnLayoutChangeListener,MapEventsReceiver {
 
     public PathOverlay parseGpxFile(Route route) {
 
@@ -66,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
         System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLL");
         System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLL");
-        System.out.println("W:" + map.getWidth() +"H:"+ map.getHeight());
+        System.out.println("W:" + map.getWidth() + "H:" + map.getHeight());
 
         if (_route_id != 0 && map.getWidth() != 0) {
             map.zoomToBoundingBox(_get_route(_route_id).boundingBox(this));
@@ -89,8 +98,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     public List<PoiType> _list_poi_type;
     public List<Poi> _list_poi;
     public List<Obstacle> _list_obstacle;
-
     int _route_id;
+    private DbManager dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         gps.start();
 
         setContentView(R.layout.activity_main);
+
+        dbHelper = new DbManager(this);
 
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
@@ -146,6 +157,54 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+    }
+
+    //Handling Map events
+    @Override
+    public boolean singleTapConfirmedHelper(GeoPoint p) {
+        Toast.makeText(this, "Tap on (" + p.getLatitude() + "," + p.getLongitude() + ")", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
+    // TODO: must be fixed, is not working yet
+    @Override
+    public boolean longPressHelper(GeoPoint p) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Neues Hindernis");
+        builder.setIcon(R.drawable.marker_stufe);
+
+        final double latitude = p.getLatitude();
+        final double longitude = p.getLongitude();
+
+        final float lat_f = (float) latitude;
+        final float lon_f = (float) longitude;
+        final int type = 1;
+
+        String obstacle_types[] = new String[]{"Schranke", "Treppe", "Engstelle", "Stufe", "Rine", "Poller", "Abhang"};
+        final Spinner obstacle_type_spinner = new Spinner(this);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1, obstacle_types);
+        obstacle_type_spinner.setAdapter(adapter);
+
+        builder.setView(obstacle_type_spinner);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dbHelper.open();
+                dbHelper.insertObstacle(lat_f,lon_f,obstacle_type_spinner.getSelectedItem().toString(), type);
+                dbHelper.close();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+        return true;
     }
 
     @Override
@@ -174,6 +233,10 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         _addPoiToMap(map);
         _addObstaclesToMap(map);
         _addRoutesToMap(map);
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        map.getOverlays().add(0, mapEventsOverlay);
+
     }
 
     @Override
@@ -195,10 +258,10 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         System.out.println("####################################################################################### onStop");
 
         SharedPreferences.Editor editor = _preferences.edit();
-        editor.putFloat("Latitude", (float)map.getMapCenter().getLatitude());
+        editor.putFloat("Latitude", (float) map.getMapCenter().getLatitude());
         editor.putFloat("Longitude", (float)map.getMapCenter().getLongitude());
         editor.putInt("ZoomLevel", map.getZoomLevel());
-        editor.commit();
+            editor.commit();
     }
 
     @Override
@@ -258,13 +321,25 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
                     new GeoPoint(obstacle.location().getLatitude(), obstacle.location().getLongitude()));
             switch (obstacle.type()) {
                 case 1:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_yellow));
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_schranke));
                     break;
                 case 2:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_blue));
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_treppe));
                     break;
                 case 3:
-                    item.setMarker(getResources().getDrawable(R.drawable.marker_red));
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_engstelle));
+                    break;
+                case 4:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_stufe));
+                    break;
+                case 5:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_rinne));
+                    break;
+                case 6:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_poller));
+                    break;
+                case 7:
+                    item.setMarker(getResources().getDrawable(R.drawable.marker_schranke));
                     break;
                 default:
                     item.setMarker(getResources().getDrawable(R.drawable.marker_default));
@@ -327,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         return null;
     }
 
-    public void onClickgetLocation (View view){
+    public void onClickgetLocation (View view) {
 
         GPSTracker gpst = new GPSTracker(MainActivity.this);
         // check if GPS enabled
@@ -343,13 +418,13 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             Marker startMarker = new Marker(map);
             startMarker.setPosition(new GeoPoint(latitude, longitude));
             startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            startMarker.setIcon(getResources().getDrawable(poi_marker));
+            startMarker.setIcon(getResources().getDrawable(location));
             startMarker.setTitle("Ihr Standort:" + " Lat: " + gpst.getLatitude() + " Lon: " + gpst.getLongitude());
             map.getOverlays().add(startMarker);
 
-        }
-        else {
+        } else {
             gpst.stopUsingGPS();
         }
     }
+
 }

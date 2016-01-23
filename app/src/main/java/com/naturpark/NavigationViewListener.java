@@ -40,10 +40,10 @@ public class NavigationViewListener implements NavigationView.OnNavigationItemSe
             case R.id.list_route:
                 startListRouteActivity();
                 return true;
-
+            /* Optional
             case R.id.list_poi_type:
                 startListPoiTypeActivity();
-                return true;
+                return true;*/
             case R.id.search:
                 startSearchPoiActivity();
                 return true;

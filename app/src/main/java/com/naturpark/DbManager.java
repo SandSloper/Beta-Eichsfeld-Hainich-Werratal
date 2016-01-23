@@ -102,7 +102,7 @@ public class DbManager extends SQLiteOpenHelper {
         List<Obstacle> list_obstacle = new ArrayList<Obstacle>();
 
         try {
-            Cursor cursor = _database.rawQuery("SELECT type, route_id, latitude, longitude FROM obstacle;", null);
+            Cursor cursor = _database.rawQuery("SELECT type, route_id, latitude, longitude, name FROM obstacle;", null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
@@ -110,12 +110,13 @@ public class DbManager extends SQLiteOpenHelper {
                 int route_id = cursor.getInt(cursor.getColumnIndex("route_id"));
                 double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
                 double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+                String name = cursor.getString(cursor.getColumnIndex("name"));
 
                 Location location = new Location("database");
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
 
-                list_obstacle.add(new Obstacle(type, route_id, location));
+                list_obstacle.add(new Obstacle(type, route_id, location, name));
 
                 cursor.moveToNext();
             }
@@ -279,5 +280,18 @@ public class DbManager extends SQLiteOpenHelper {
             mCursor.moveToFirst();
         }
         return mCursor;
+    }
+    public void insertObstacle(float latitude, float longitude, String name, int type)
+    {
+        String query = "INSERT INTO obstacle (type,latitude,longitude,name) VALUES('"+type+"','"+name+"','"+latitude+"','"+longitude+"');";
+        _database.execSQL(query);
+    }
+    public boolean updateObstacle(float latitude, float longitude, String name, int type) {
+        ContentValues args = new ContentValues();
+        args.put("name", name);
+        args.put("latitude", latitude);
+        args.put("longitude", longitude);
+        args.put("type", type);
+        return _database.update("obstacle", args, "id" + "=", null) > 0;
     }
 }

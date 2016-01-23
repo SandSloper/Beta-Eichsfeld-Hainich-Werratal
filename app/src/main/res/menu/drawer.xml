@@ -6,20 +6,22 @@
         <item
             android:id="@+id/karte"
             android:checked="false"
-            android:icon="@drawable/ic_one"
+            android:icon="@drawable/map"
             android:title="Karte" />
 
         <item
             android:id="@+id/list_route"
             android:checked="false"
-            android:icon="@drawable/ic_two"
+            android:icon="@drawable/route"
             android:title="Routen auswählen" />
 
+       <!-- Optional
         <item
             android:id="@+id/list_poi_type"
             android:checked="false"
             android:icon="@drawable/ic_three"
             android:title="POI auswählen" />
+            -->
         <item
             android:id="@+id/search"
             android:checked="false"
