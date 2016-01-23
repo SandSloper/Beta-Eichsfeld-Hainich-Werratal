@@ -18,7 +18,7 @@
         <item
             android:id="@+id/list_poi_type"
             android:checked="false"
-            android:icon="@drawable/ic_three"
+            android:icon="@drawable/poi_icon"
             android:title="POI auswählen" />
         <item
             android:id="@+id/search"

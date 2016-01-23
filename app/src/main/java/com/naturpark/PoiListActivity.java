@@ -86,10 +86,10 @@ public class PoiListActivity extends AppCompatActivity
             public void onClick(View v) {
                 if (findViewById(R.id.tablelayout).getVisibility() == View.VISIBLE) {
                     findViewById(R.id.tablelayout).setVisibility(View.GONE);
-                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.icon_arrow_down));
+                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.shift_left));
                 } else {
                     findViewById(R.id.tablelayout).setVisibility(View.VISIBLE);
-                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.icon_arrow_up));
+                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.shift_right));
                 }
             }
         });
