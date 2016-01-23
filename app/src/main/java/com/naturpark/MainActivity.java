@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -109,9 +110,9 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
                 MainActivity.this);
         gps.start();
 
-        setContentView(R.layout.activity_main);
-
         dbHelper = new DbManager(this);
+
+        setContentView(R.layout.activity_main);
 
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPQUESTOSM);
@@ -123,6 +124,25 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
         map.addOnLayoutChangeListener(this);
+
+        _route_id = getIntent().getIntExtra("Route", 0);
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:route:" + _route_id);
+
+        _list_route = dbHelper.queryRouteList();
+        _list_poi_type = dbHelper.queryPoiTypeList();
+        _list_poi = dbHelper.queryPoiList();
+        _list_obstacle = dbHelper.queryObstacleList();
+        System.out.println("num route:" + _list_route.size());
+        System.out.println("num_poi_type:" + _list_poi_type.size());
+        System.out.println("num_poi:" + _list_poi.size());
+        System.out.println("num_obstacle:" + _list_obstacle.size());
+
+        _addPoiToMap(map);
+        _addObstaclesToMap(map);
+        _addRoutesToMap(map);
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        map.getOverlays().add(0, mapEventsOverlay);
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -177,59 +197,48 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
         final float lat_f = (float) latitude;
         final float lon_f = (float) longitude;
-        final HashMap o_map = new HashMap();
 
-        String obstacle_types[] = new String[]{"Bitte wähöen","Schranke", "Treppe", "Engstelle", "Stufe", "Rinne", "Poller", "Abhang"};
+        String obstacle_types[] = new String[]{"Bitte wählen","Schranke", "Treppe", "Engstelle", "Stufe", "Rinne", "Poller", "Abhang"};
         final Spinner obstacle_type_spinner = new Spinner(this);
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, android.R.id.text1, obstacle_types);
         obstacle_type_spinner.setAdapter(adapter);
 
         builder.setView(obstacle_type_spinner);
 
-        if (obstacle_type_spinner.getSelectedItem().toString() == "Schranke"){
-            type = 1;
-            o_map.put(type,"type");
-            o_map.put("Schranke","name");
-        }
-        if (obstacle_type_spinner.getSelectedItem().toString() == "Treppe"){
-            type = 2;
-            o_map.put(type,"type");
-            o_map.put("Treppe","name");
-        }
-        if (obstacle_type_spinner.getSelectedItem().toString() == "Engstelle"){
-            type = 3;
-            o_map.put(type,"type");
-            o_map.put("Engstelle","name");
-        }
-        if (obstacle_type_spinner.getSelectedItem().toString() == "Stufe"){
-            type = 4;
-            o_map.put(type,"type");
-            o_map.put("Stufe","name");
-        }
-        if (obstacle_type_spinner.getSelectedItem().toString() == "Rinne"){
-            type = 5;
-            o_map.put(type,"type");
-            o_map.put("Rinne","name");
-        }
-        if (obstacle_type_spinner.getSelectedItem().toString() == "Poller"){
-            type = 6;
-            o_map.put(type,"type");
-            o_map.put("Poller","name");
-        }
-        if (obstacle_type_spinner.getSelectedItem().toString() == "Abhang"){
-            type = 7;
-            o_map.put(type,"type");
-            o_map.put("Abhang","name");
-        }
-
-        o_map.put(lat_f,"latitude");
-        o_map.put(lon_f,"longitude");
-
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dbHelper.open();
-                dbHelper.insertObstacle(o_map);
+                if (obstacle_type_spinner.getSelectedItem().toString() == "Schranke"){
+                    type = 1;
+                    name = "Schranke";
+                    System.out.println("--------------------------------------------------------"+type+name);
+                }
+                if (obstacle_type_spinner.getSelectedItem().toString() == "Treppe"){
+                    type = 2;
+                    name = "Treppe";
+                }
+                if (obstacle_type_spinner.getSelectedItem().toString() == "Engstelle"){
+                    type = 3;
+                    name = "Engstelle";
+                }
+                if (obstacle_type_spinner.getSelectedItem().toString() == "Stufe"){
+                    type = 4;
+                    name = "Stufe";
+                }
+                if (obstacle_type_spinner.getSelectedItem().toString() == "Rinne"){
+                    type = 5;
+                    name = "Rinne";
+                }
+                if (obstacle_type_spinner.getSelectedItem().toString() == "Poller"){
+                    type = 6;
+                    name = "Poller";
+                }
+                if (obstacle_type_spinner.getSelectedItem().toString() == "Abhang"){
+                    type = 7;
+                    name = "Abhang";
+                }
+                dbHelper.insertObstacle(type, lat_f, lon_f, name);
+                Log.d("Insert: ", "Inserting ..");
                 dbHelper.close();
 
             }
@@ -249,31 +258,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         super.onStart();
 
         System.out.println("####################################################################################### onStart");
-
-        _route_id = getIntent().getIntExtra("Route", 0);
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:route:" + _route_id);
-
-
-        DbManager dbManager = new DbManager(this, _creating);
-        _creating = false;
-
-        _list_route = dbManager.queryRouteList();
-        _list_poi_type = dbManager.queryPoiTypeList();
-        _list_poi = dbManager.queryPoiList();
-        _list_obstacle = dbManager.queryObstacleList();
-        System.out.println("num route:" + _list_route.size());
-        System.out.println("num_poi_type:" + _list_poi_type.size());
-        System.out.println("num_poi:" + _list_poi.size());
-        System.out.println("num_obstacle:" + _list_obstacle.size());
-
-        map.getOverlays().clear();
-        _addPoiToMap(map);
-        _addObstaclesToMap(map);
-        _addRoutesToMap(map);
-
-        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
-        map.getOverlays().add(0, mapEventsOverlay);
-
     }
 
     @Override

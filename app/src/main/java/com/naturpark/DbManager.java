@@ -37,8 +37,7 @@ public class DbManager extends SQLiteOpenHelper {
     public static final String KEY_INFO = "info";
 
     private static final String TABLE_NAME = "poi";
-    public static final String COLUMN_NAME = "name";
-
+ 
     private SQLiteDatabase _database;
 
     public DbManager(Context context, boolean enforce_copy) {
@@ -103,10 +102,11 @@ public class DbManager extends SQLiteOpenHelper {
         List<Obstacle> list_obstacle = new ArrayList<Obstacle>();
 
         try {
-            Cursor cursor = _database.rawQuery("SELECT type, route_id, latitude, longitude, name FROM obstacle;", null);
+            Cursor cursor = _database.rawQuery("SELECT _id,type, route_id, latitude, longitude, name FROM obstacle;", null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
+                int id = cursor.getInt(cursor.getColumnIndex("_id"));
                 int type = cursor.getInt(cursor.getColumnIndex("type"));
                 int route_id = cursor.getInt(cursor.getColumnIndex("route_id"));
                 double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
@@ -117,7 +117,7 @@ public class DbManager extends SQLiteOpenHelper {
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
 
-                list_obstacle.add(new Obstacle(type, route_id, location, name));
+                list_obstacle.add(new Obstacle(id,type, route_id, location, name));
 
                 cursor.moveToNext();
             }
@@ -286,15 +286,11 @@ public class DbManager extends SQLiteOpenHelper {
         }
         return mCursor;
     }
-    public void insertObstacle(HashMap<String, String> queryValues)
-    {
+    public void insertObstacle(int type,float latitude,float longitude, String name){
+
         _database = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("name", queryValues.get("name"));
-        values.put("type", queryValues.get("type"));
-        values.put("latitude", queryValues.get("latitude"));
-        values.put("longitude", queryValues.get("longitude"));
-        _database.insert("obstacle", null, values);
-        _database.close();
+        String query = "INSERT INTO obstacle (type,latitude,longitude,name) VALUES('"+type+"','"+latitude+"','"+longitude+"','"+name+"');";
+        System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Insert: "+query);
+        _database.execSQL(query);
     }
 }
