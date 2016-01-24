@@ -1,23 +1,16 @@
 package com.naturpark;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.internal.view.menu.MenuItemImpl;
 import android.support.v7.widget.Toolbar;
-import android.view.ActionProvider;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -32,20 +25,15 @@ import android.widget.TextView;
 import com.naturpark.data.Poi;
 import com.naturpark.data.PoiType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PoiListActivity extends AppCompatActivity
-        implements View.OnClickListener {
-
-    private SharedPreferences _preferences;
+        implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     private List<PoiType> _list_poi_type;
     private List<Poi> _list_poi;
 
-    // filter variables
-    private List<Integer> _filtered_poi_types= new ArrayList<Integer>();
+    private int _type = 0;
     private int _classification = 0;
 
     private NavigationView navigationView;
@@ -54,27 +42,8 @@ public class PoiListActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("####################################################################################### PoiList::onCreate");
         setContentView(R.layout.activity_poi_type_list);
 
-        _preferences = getSharedPreferences("naturpark.prf", MODE_PRIVATE);
-
-        List<String> strings = new ArrayList<String>(Arrays.asList(_preferences.getString("FilteredPoiTypes", "").split(",")));
-        for (String s: strings) {
-            try {
-                _filtered_poi_types.add(Integer.parseInt(s.trim()));
-            }
-            catch (NumberFormatException e) {
-                /* nothing to do here */
-                System.out.println("+++++++++++++++++++exc:"+s);
-            }
-        }
-
-
-        _classification = _preferences.getInt("FilteredPoiClassification", 0);
-
-        System.out.println("XXXXXXXXXX:" + _filtered_poi_types.toString());
-        System.out.println("XXXXXXXXXX:" + _classification);
 
         _list_poi_type = new DbManager(this).queryPoiTypeList();
         _list_poi = new DbManager(this).queryPoiList();
@@ -93,6 +62,7 @@ public class PoiListActivity extends AppCompatActivity
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openDrawer, R.string.closeDrawer) {
 
+            @Override
             public void onDrawerClosed(View drawerView) {
                 // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
                 super.onDrawerClosed(drawerView);
@@ -116,49 +86,13 @@ public class PoiListActivity extends AppCompatActivity
             public void onClick(View v) {
                 if (findViewById(R.id.tablelayout).getVisibility() == View.VISIBLE) {
                     findViewById(R.id.tablelayout).setVisibility(View.GONE);
-                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.icon_arrow_down));
+                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.shift_left));
                 } else {
                     findViewById(R.id.tablelayout).setVisibility(View.VISIBLE);
-                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.icon_arrow_up));
+                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.shift_right));
                 }
             }
         });
-
-        ((TextView) findViewById(R.id.textview_type)).setText(_filtered_poi_types.toString());
-        ((TextView) findViewById(R.id.textview_type)).setText(Poi.RatingStrings[_classification]);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        System.out.println("####################################################################################### PoiList::onStart");
-    }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        System.out.println("####################################################################################### PoiList::onStop");
-
-        SharedPreferences.Editor editor = _preferences.edit();
-        editor.putString("FilteredPoiTypes", _filtered_poi_types.toString().substring(1,_filtered_poi_types.toString().length()-1));
-        editor.putInt("FilteredPoiClassification", _classification);
-        editor.commit();
-
-        System.out.println("XXXXXXXXXX:" + _filtered_poi_types.toString().substring(1,_filtered_poi_types.toString().length()-1));
-        System.out.println("XXXXXXXXXX:" + _classification);
-    }
-
-    public void onClick(View view) {
-
-        view.setBackgroundColor(Color.GRAY);
-
-        System.out.print("Seleceted POI:" + view.getId());
-
-        SharedPreferences.Editor editor = _preferences.edit();
-        editor.putInt("SelectedRoute", 0);
-        editor.putInt("SelectedPoi", view.getId());
-        editor.commit();
-
-        startActivity(new Intent(this, MainActivity.class));
     }
 
     public void onClickHeaderType(View view) {
@@ -166,22 +100,12 @@ public class PoiListActivity extends AppCompatActivity
 
         for (PoiType poiType : _list_poi_type) {
             menu.getMenu().add(Menu.NONE, poiType.id(), Menu.NONE, poiType.name());
-            menu.getMenu().findItem(poiType.id()).setCheckable(true);
-            if (_filtered_poi_types.contains(poiType.id()))
-                menu.getMenu().findItem(poiType.id()).setChecked(true);
         }
         menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-
-                menuItem.setChecked(!menuItem.isChecked());
-                if (menuItem.isChecked()) {
-                    _filtered_poi_types.add(new Integer(menuItem.getItemId()));
-                }
-                else {
-                    _filtered_poi_types.remove(new Integer(menuItem.getItemId()));
-                }
-                ((TextView) findViewById(R.id.textview_type)).setText(_filtered_poi_types.toString());
+                _type = menuItem.getItemId();
+                ((TextView) findViewById(R.id.textview_type)).setText(menuItem.getTitle());
                 init();
                 return true;
             }
@@ -200,14 +124,9 @@ public class PoiListActivity extends AppCompatActivity
             return;
         }
 
-        for (int i = 0; i < Poi.RatingStrings.length; ++i) {
-            menu.getMenu().add(Menu.NONE, i, Menu.NONE, Poi.RatingStrings[i]);
-        }
-        /*
         menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "Ungeeingt");
         menu.getMenu().add(Menu.NONE, 2, Menu.NONE, "Bedingt");
         menu.getMenu().add(Menu.NONE, 3, Menu.NONE, "Geeignet");
-        */
         menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -220,14 +139,6 @@ public class PoiListActivity extends AppCompatActivity
         menu.show();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        item.setChecked(!item.isChecked());
-
-        /*_type = item.getItemId();*/
-        return true;
-    }
-
     public void init() {
         LinearLayout list = (LinearLayout) findViewById(R.id.layout_poi);
         list.removeAllViews();
@@ -238,7 +149,7 @@ public class PoiListActivity extends AppCompatActivity
 
         for (Poi poi : _list_poi) {
 
-            if (!_filtered_poi_types.contains(poi.type())) {
+            if (_type != 0 && poi.type() != _type) {
                 continue;
             }
 
@@ -271,15 +182,32 @@ public class PoiListActivity extends AppCompatActivity
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.ALIGN_LEFT);
                 params.addRule(RelativeLayout.BELOW, 1);
-                row.addView(_create_text_view(2, _get_poi_type(poi.type()).name(), 16, _get_classification_color(poi.classification_id())), params);
+                row.addView(_create_text_view(2, _get_poi_type(poi.type()).name(), 16), params);
             }
             list.addView(row);
         }
 
-        ((TextView) findViewById(R.id.textview_summary)).setText(cnt_route + "/" + _list_poi.size() + " ausgewählte POI");
+        ((TextView)findViewById(R.id.textview_summary)).setText(cnt_route + "/" + _list_poi.size() + " ausgewählte POI");
     }
 
 
+    public void onCheckedChanged(CompoundButton button, boolean isChecked) {
+        PoiType poiType = (PoiType)button.getTag();
+
+        if(button.isChecked() && !poiType.is_visible()) {
+            poiType.show();
+            new DbManager(this).update(poiType);
+        }
+        else if (!button.isChecked() && poiType.is_visible()) {
+            poiType.hide();
+            new DbManager(this).update(poiType);
+        }
+    }
+
+    public void onClick(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 
     private TextView _create_text_view(int val) {
         TextView view = new TextView(this);
@@ -314,6 +242,15 @@ public class PoiListActivity extends AppCompatActivity
         view.setText(text);
 
         return view;
+    }
+
+    private CheckBox _create_check_box(PoiType poiType) {
+        CheckBox checkBox = new CheckBox(this);
+        checkBox.setOnCheckedChangeListener(this);
+        checkBox.setTag(poiType);
+        checkBox.setChecked(poiType.is_visible());
+
+        return checkBox;
     }
 
     private String _get_classifcation_text(int rating)

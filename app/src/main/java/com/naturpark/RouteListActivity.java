@@ -1,7 +1,6 @@
 package com.naturpark;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -32,8 +31,6 @@ import java.util.List;
 
 public class RouteListActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private SharedPreferences _preferences;
-
     private List<Route> _list_route;
     private List<Obstacle> _list_obstacle;
 
@@ -45,6 +42,8 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
     private int _grade_avg;
     private int _rating;
 
+    boolean _sort_by_name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,15 +52,13 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         setSupportActionBar(toolbar);
         System.out.println("####################################################################### onCreate");
 
-        _preferences = getSharedPreferences("naturpark.prf", MODE_PRIVATE);
-
-        _region = _preferences.getString("SelectRouteByRegion", "");
-        _length_min = _preferences.getFloat("SelectRouteByLengthMin", 0);
-        _length_max = _preferences.getFloat("SelectRouteByLengthMax", 0);
-        _quality = _preferences.getInt("SelectRouteByQuality", 0);
-        _rating = _preferences.getInt("SelectRouteByRating", 0);
-        _grade_avg = _preferences.getInt("SelectRouteByGrade", 0);
-
+        _region = "";
+        _length_min = 0;
+        _length_max = 0;
+        _quality = 0;
+        _rating = 0;
+        _grade_avg = 0;
+        _sort_by_name = false;
         _list_route = new DbManager(this).queryRouteList();
         _list_obstacle = new DbManager(this).queryObstacleList();
         init();
@@ -101,11 +98,11 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
             public void onClick(View v) {
                 if (findViewById(R.id.tablelayout).getVisibility() == View.VISIBLE) {
                     findViewById(R.id.tablelayout).setVisibility(View.GONE);
-                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.icon_arrow_down));
+                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.shift_left));
                 }
                 else {
                     findViewById(R.id.tablelayout).setVisibility(View.VISIBLE);
-                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.icon_arrow_up));
+                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.shift_right));
                 }
             }
         });
@@ -118,21 +115,6 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        System.out.println("####################################################################### onPause");
-
-        SharedPreferences.Editor editor = _preferences.edit();
-        editor.putString("SelectRouteByRegion", _region);
-        editor.putFloat("SelectRouteByLengthMin", _length_min);
-        editor.putFloat("SelectRouteByLengthMax", _length_max);
-        editor.putInt("SelectRouteByQuality", _quality);
-        editor.putInt("SelectRouteByRating", _rating);
-        editor.putInt("SelectRouteByGrade", _grade_avg);
-        editor.commit();
-    }
-
-    @Override
     public void onClick(View view) {
 
 
@@ -140,14 +122,11 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
 
         System.out.print("Seleceted Route ID:" + view.getId());
 
-        SharedPreferences.Editor editor = _preferences.edit();
-        editor.putInt("SelectedRoute", view.getId());
-        editor.putInt("SelectedPoi", 0);
-        editor.commit();
-
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("Route", view.getId());
         startActivity(intent);
     }
+
 
     public void onClickHeaderRegion(View view) {
         PopupMenu menu = new PopupMenu(this, view);

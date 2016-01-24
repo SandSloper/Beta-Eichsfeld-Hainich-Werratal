@@ -2,6 +2,7 @@ package com.naturpark;
 
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.database.SQLException;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -34,8 +35,8 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -69,22 +70,13 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
     @Override
     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+        System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+        System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+        System.out.println("W:" + map.getWidth() + "H:" + map.getHeight());
 
         if (_route_id != 0 && map.getWidth() != 0) {
             map.zoomToBoundingBox(_get_route(_route_id).boundingBox(this));
             _route_id = 0;
-        }
-
-        System.out.println("_________________________________________________"+ _poi_id +" : "+ _list_poi.size());
-        System.out.println("\n\n\n");
-        Poi poi = _get_poi(_poi_id);
-        if (poi != null && map.getWidth() != 0) {
-            System.out.println("_________________________________________________"+ _poi_id);
-            System.out.println("\n\n\n");
-
-            map.getController().setZoom(map.getMaxZoomLevel() - 1);
-            map.getController().setCenter(new GeoPoint(poi.location()));
-            _poi_id = 0;
         }
     }
 
@@ -104,23 +96,14 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     private List<Poi> _list_poi;
     private List<Obstacle> _list_obstacle;
 
-    // selected route or POI
     int _route_id;
-    int _poi_id;
-
-    // filter variables
-    private List<Integer> _filtered_poi_types= new ArrayList<Integer>();
-    private int _classification = 0;
-
-    private DbManager dbHelper;
+    DbManager dbHelper;
     private int type;
     private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        System.out.println("####################################################################################### Main::onCreate");
 
         _creating = true;
         _preferences = getSharedPreferences("naturpark.prf", MODE_PRIVATE);
@@ -130,6 +113,16 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         gps.start();
 
         dbHelper = new DbManager(this);
+        try {
+            dbHelper.create();
+        } catch (IOException ioe) {
+            throw new Error("Unable to create database");
+        }
+        try {
+            dbHelper.open();
+        }catch(SQLException sqle){
+            throw sqle;
+        }
 
         setContentView(R.layout.activity_main);
 
@@ -283,31 +276,31 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     protected  void onResume() {
         super.onResume();
 
-        System.out.println("####################################################################################### Main::onResume");
+        System.out.println("####################################################################################### onResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        System.out.println("####################################################################################### Main::onPause");
+        System.out.println("####################################################################################### onPause");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        System.out.println("####################################################################################### Main::onStop");
+        System.out.println("####################################################################################### onStop");
 
         SharedPreferences.Editor editor = _preferences.edit();
         editor.putFloat("Latitude", (float) map.getMapCenter().getLatitude());
         editor.putFloat("Longitude", (float)map.getMapCenter().getLongitude());
         editor.putInt("ZoomLevel", map.getZoomLevel());
-        editor.commit();
+            editor.commit();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("####################################################################################### Main::onDestroy");
+        System.out.println("####################################################################################### onDestroy");
     }
 
     private PoiType _getPoiType(int id) {
@@ -327,12 +320,11 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             OverlayItem item = new OverlayItem(poi.name(), poi.info(),
                     new GeoPoint(poi.location().getLatitude(), poi.location().getLongitude()));
             PoiType poiType = _getPoiType(poi.type());
-            if (poiType != null) {
+            if (poiType != null)
                 item.setMarker(getResources().getDrawable(getResources().getIdentifier(poiType.iconName(), "drawable", getPackageName())));
 
-                if (_filtered_poi_types.contains(new Integer(poiType.id())))
-                    overlayItemArray.add(item);
-            }
+            if (poiType.is_visible())
+                overlayItemArray.add(item);
         }
 
         ItemizedIconOverlay.OnItemGestureListener gestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {

@@ -7,7 +7,8 @@ import android.location.Location;
 
 public class Poi {
 
-    static public String[] RatingStrings = { "Alle", "Ungeeigent", "Bedingt", "Ungeeignet" };
+    // generate a runtime dynamic id, used during for easy identification in app
+    static private int Id = 1;
 
     private int _id;
     private int _type;
@@ -17,9 +18,9 @@ public class Poi {
     private String _classification;
     private String _info;
 
-    public Poi(int id, int type, Location location, String name, String address,String classification,String info)
+    public Poi(int type, Location location, String name, String address,String classification,String info)
     {
-        _id = id;
+        _id = Id++;
         _type = type;
         _location = location;
         _name = name;
