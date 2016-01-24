@@ -1,0 +1,375 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/0 http://www.topografix.com/GPX/1/0/gpx.xsd" creator="Bike Route Toaster http://bikeroutetoaster.com/" version="1.0">
+  <author>BikeRouteToaster.com</author>
+  <trk>
+    <name>9</name>
+    <trkseg>
+      <trkpt lat="51.05805" lon="13.75938">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>0</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05971" lon="13.76269">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>231.414178332034</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06128" lon="13.76683">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>238.895466884346</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06232" lon="13.77095">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>248.118939107649</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06258" lon="13.77325">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>259.804131512452</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06274" lon="13.77584">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>264.387098996613</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06297" lon="13.77955">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>264.367778022777</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06304" lon="13.78123">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>266.207548205479</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06279" lon="13.78462">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>276.69398473973</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06247" lon="13.78722">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>281.081337433571</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06231" lon="13.78889">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>278.668433506858</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06159" lon="13.79359">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>283.700506220178</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06134" lon="13.79511">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>284.665903369172</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.0615" lon="13.79582">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>250.274325053922</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06045" lon="13.7999">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>292.269520287786</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05921" lon="13.80294">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>302.984285036053</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05846" lon="13.80391">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>320.893112881455</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05695" lon="13.80569">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>323.465026005533</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05467" lon="13.80711">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>338.621525184191</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05356" lon="13.8082">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>328.315040213987</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05233" lon="13.8059">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>49.609659137882</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05217" lon="13.80642">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>296.080995679619</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05218" lon="13.80702">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>268.481481966293</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05199" lon="13.80728">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>319.297714435794</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05262" lon="13.80861">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>233.000977084051</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05288" lon="13.80917">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>233.550741124498</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05399" lon="13.81196">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>237.670618609904</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05441" lon="13.81301">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>237.529774435986</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05431" lon="13.81406">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>278.6159032173</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05466" lon="13.81389">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>163.021936774937</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05627" lon="13.81241">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>149.979507014019</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05705" lon="13.81155">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>145.276994561116</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05807" lon="13.80966">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>130.649632554483</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05872" lon="13.80801">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>122.077406816716</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06097" lon="13.80369">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>129.646240140265</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06131" lon="13.80309">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>132.03856318386</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06243" lon="13.79996">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>119.653937221629</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06321" lon="13.79683">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>111.628191107151</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06363" lon="13.7944">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>105.376413389769</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06398" lon="13.79217">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>104.021391548853</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06474" lon="13.78779">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>105.43327422235</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06498" lon="13.78745">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>138.321503806147</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06536" lon="13.78503">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>104.028075611457</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.0656" lon="13.78159">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>96.3336017314963</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06556" lon="13.78058">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>86.3935711614893</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06569" lon="13.77925">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>98.8402829386929</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06576" lon="13.77863">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>100.184841207535</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06586" lon="13.77722">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>96.4383969504318</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06584" lon="13.7764">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>87.7770562863143</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.0655" lon="13.7735">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>79.4311118979368</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06505" lon="13.76981">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>79.0164961700574</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06421" lon="13.76709">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>63.8289659518761</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06331" lon="13.7649">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>56.8177050034877</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06289" lon="13.76361">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>62.612684111573</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.06091" lon="13.75934">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>53.5779977635901</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05968" lon="13.75642">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>56.1681984932036</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05886" lon="13.75434">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>57.9015891425822</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05855" lon="13.75417">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>19.0176923974013</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05834" lon="13.75342">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>65.9874150679767</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05635" lon="13.75569">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>324.361102423103</course>
+        <speed>0</speed>
+      </trkpt>
+      <trkpt lat="51.05798" lon="13.75921">
+        <ele>0</ele>
+        <time>2016-01-09T17:41:16Z</time>
+        <course>233.621154204766</course>
+        <speed>0</speed>
+      </trkpt>
+    </trkseg>
+  </trk>
+</gpx>
