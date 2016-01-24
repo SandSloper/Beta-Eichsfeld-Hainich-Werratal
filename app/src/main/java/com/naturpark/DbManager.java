@@ -218,16 +218,15 @@ public class DbManager extends SQLiteOpenHelper {
         List<PoiType> list_poi_type = new ArrayList<PoiType>();
 
         try {
-            Cursor cursor = _database.rawQuery("SELECT id, name, icon_name, visible FROM Poi_type;", null);
+            Cursor cursor = _database.rawQuery("SELECT id, name, icon_name FROM Poi_type;", null);
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
                 int id = cursor.getInt(cursor.getColumnIndex("id"));
                 String name = cursor.getString(cursor.getColumnIndex("name"));
                 String iconName = cursor.getString(cursor.getColumnIndex("icon_name"));
-                boolean visible = cursor.getInt(cursor.getColumnIndex("visible")) > 0;
 
-                list_poi_type.add(new PoiType(id, name, iconName, visible));
+                list_poi_type.add(new PoiType(id, name, iconName));
 
                 cursor.moveToNext();
             }
@@ -248,20 +247,21 @@ public class DbManager extends SQLiteOpenHelper {
             Cursor cursor = _database.rawQuery("SELECT type, latitude, longitude, name, address, classification,info FROM Poi;", null);
             cursor.moveToFirst();
 
+            int id = 1;
             while (!cursor.isAfterLast()) {
                 int type = cursor.getInt(cursor.getColumnIndex("type"));
                 double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
                 double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
                 String name = cursor.getString(cursor.getColumnIndex("name"));
                 String address = cursor.getString(cursor.getColumnIndex("address"));
-                String classification = cursor.getString(cursor.getColumnIndex("classification"));
+                String rating = cursor.getString(cursor.getColumnIndex("classification"));
                 String info = cursor.getString(cursor.getColumnIndex("info"));
 
                 Location location = new Location("database");
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
 
-                list_poi.add(new Poi(type, location, name, address, classification,info));
+                list_poi.add(new Poi(id++, type, location, name, address, rating,info));
 
                 cursor.moveToNext();
             }

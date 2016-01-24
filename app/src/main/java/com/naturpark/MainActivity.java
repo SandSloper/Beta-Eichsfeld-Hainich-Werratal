@@ -70,13 +70,22 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
     @Override
     public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLL");
-        System.out.println("LLLLLLLLLLLLLLLLLLLLLLLLLLLL");
-        System.out.println("W:" + map.getWidth() + "H:" + map.getHeight());
 
         if (_route_id != 0 && map.getWidth() != 0) {
             map.zoomToBoundingBox(_get_route(_route_id).boundingBox(this));
             _route_id = 0;
+        }
+
+        System.out.println("_________________________________________________"+ _poi_id +" : "+ _list_poi.size());
+        System.out.println("\n\n\n");
+        Poi poi = _get_poi(_poi_id);
+        if (poi != null && map.getWidth() != 0) {
+            System.out.println("_________________________________________________"+ _poi_id);
+            System.out.println("\n\n\n");
+
+            map.getController().setZoom(map.getMaxZoomLevel() - 1);
+            map.getController().setCenter(new GeoPoint(poi.location()));
+            _poi_id = 0;
         }
     }
 
@@ -96,7 +105,14 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     private List<Poi> _list_poi;
     private List<Obstacle> _list_obstacle;
 
+    // selected route or POI
     int _route_id;
+    int _poi_id;
+
+    // filter variables
+    private List<Integer> _filtered_poi_types= new ArrayList<Integer>();
+    private int _classification = 0;
+
     DbManager dbHelper;
     private int type;
     private String name;
@@ -104,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        System.out.println("####################################################################################### Main::onCreate");
 
         _creating = true;
         _preferences = getSharedPreferences("naturpark.prf", MODE_PRIVATE);
@@ -119,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             throw new Error("Unable to create database");
         }
         try {
-            dbHelper.open();
+            dbHelper.op    // filter variables
         }catch(SQLException sqle){
             throw sqle;
         }
@@ -136,25 +154,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         map.setMultiTouchControls(true);
         map.setUseDataConnection(true);
         map.addOnLayoutChangeListener(this);
-
-        _route_id = getIntent().getIntExtra("Route", 0);
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!:route:" + _route_id);
-
-        _list_route = dbHelper.queryRouteList();
-        _list_poi_type = dbHelper.queryPoiTypeList();
-        _list_poi = dbHelper.queryPoiList();
-        _list_obstacle = dbHelper.queryObstacleList();
-        System.out.println("num route:" + _list_route.size());
-        System.out.println("num_poi_type:" + _list_poi_type.size());
-        System.out.println("num_poi:" + _list_poi.size());
-        System.out.println("num_obstacle:" + _list_obstacle.size());
-
-        _addPoiToMap(map);
-        _addObstaclesToMap(map);
-        _addRoutesToMap(map);
-
-        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
-        map.getOverlays().add(0, mapEventsOverlay);
 
         // Initializing Toolbar and setting it as the actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -186,6 +185,57 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+    }
+
+    @Override
+    protected  void onStart() {
+        super.onStart();
+
+        System.out.println("####################################################################################### Main::onStart");
+
+        _preferences = getSharedPreferences("naturpark.prf", MODE_PRIVATE);
+
+
+        _route_id = _preferences.getInt("SelectedRoute", 0);
+        _poi_id = _preferences.getInt("SelectedPoi", 0);
+          System.out.println("YYYYYYYYYY:" + _route_id +":"+ _poi_id);
+
+          List<String> strings = new ArrayList<String>(Arrays.asList(_preferences.getString("FilteredPoiTypes", "").split(",")));
+          for (String s: strings) {
+              try {
+                  _filtered_poi_types.add(Integer.parseInt(s.trim()));
+              }
+              catch (NumberFormatException e) {
+                /* nothing to do here */
+              }
+          }
+          System.out.println("XXXXXXXXXX:" + _filtered_poi_types.toString());
+
+          _classification = _preferences.getInt("FilteredPoiRating", 0);
+          System.out.println("XXXXXXXXXX:" + _classification);
+
+
+
+          DbManager dbManager = new DbManager(this, _creating);
+        _creating = false;
+
+        _list_route = dbManager.queryRouteList();
+        _list_poi_type = dbManager.queryPoiTypeList();
+        _list_poi = dbManager.queryPoiList();
+        _list_obstacle = dbManager.queryObstacleList();
+        System.out.println("num route:" + _list_route.size());
+        System.out.println("num_poi_type:" + _list_poi_type.size());
+        System.out.println("num_poi:" + _list_poi.size());
+        System.out.println("num_obstacle:" + _list_obstacle.size());
+
+        map.getOverlays().clear();
+        _addPoiToMap(map);
+        _addObstaclesToMap(map);
+        _addRoutesToMap(map);
+
+        //MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        //map.getOverlays().add(0, mapEventsOverlay);
 
     }
 
@@ -266,41 +316,34 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     }
 
     @Override
-    protected  void onStart() {
-        super.onStart();
-
-        System.out.println("####################################################################################### onStart");
-    }
-
-    @Override
     protected  void onResume() {
         super.onResume();
 
-        System.out.println("####################################################################################### onResume");
+        System.out.println("####################################################################################### Main::onResume");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        System.out.println("####################################################################################### onPause");
+        System.out.println("####################################################################################### Main::onPause");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        System.out.println("####################################################################################### onStop");
+        System.out.println("####################################################################################### Main::onStop");
 
         SharedPreferences.Editor editor = _preferences.edit();
         editor.putFloat("Latitude", (float) map.getMapCenter().getLatitude());
         editor.putFloat("Longitude", (float)map.getMapCenter().getLongitude());
         editor.putInt("ZoomLevel", map.getZoomLevel());
-            editor.commit();
+        editor.commit();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("####################################################################################### onDestroy");
+        System.out.println("####################################################################################### Main::onDestroy");
     }
 
     private PoiType _getPoiType(int id) {
@@ -320,11 +363,12 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             OverlayItem item = new OverlayItem(poi.name(), poi.info(),
                     new GeoPoint(poi.location().getLatitude(), poi.location().getLongitude()));
             PoiType poiType = _getPoiType(poi.type());
-            if (poiType != null)
+            if (poiType != null) {
                 item.setMarker(getResources().getDrawable(getResources().getIdentifier(poiType.iconName(), "drawable", getPackageName())));
 
-            if (poiType.is_visible())
-                overlayItemArray.add(item);
+                if (_filtered_poi_types.contains(new Integer(poiType.id())))
+                    overlayItemArray.add(item);
+            }
         }
 
         ItemizedIconOverlay.OnItemGestureListener gestureListener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
@@ -427,6 +471,15 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         for (Route route : _list_route) {
             if (route.id() == id)
                 return route;
+        }
+
+        return null;
+    }
+
+    private Poi _get_poi(int id) {
+        for (Poi poi : _list_poi) {
+            if (poi.id() == id)
+                return poi;
         }
 
         return null;

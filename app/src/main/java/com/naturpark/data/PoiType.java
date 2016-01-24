@@ -5,28 +5,17 @@ package com.naturpark.data;
  */
 public class PoiType {
 
-    public PoiType(int id, String name, String iconName, boolean visible) {
+    public PoiType(int id, String name, String iconName) {
         _id = id;
         _name = name;
         _iconName = iconName;
-        _visible = visible;
     }
 
     public int id() { return _id; }
     public String name() { return _name; }
     public String iconName() { return _iconName; }
-    public boolean is_visible() { return _visible; }
-
-    public void hide() {
-        _visible = false;
-    }
-    public void show() {
-        _visible = true;
-    }
 
     private int _id;
     private String _name;
     private String _iconName;
-
-    private boolean _visible;
 }

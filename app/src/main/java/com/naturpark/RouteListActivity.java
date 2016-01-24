@@ -1,6 +1,7 @@
 package com.naturpark;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -31,6 +32,8 @@ import java.util.List;
 
 public class RouteListActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private SharedPreferences _preferences;
+
     private List<Route> _list_route;
     private List<Obstacle> _list_obstacle;
 
@@ -42,8 +45,6 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
     private int _grade_avg;
     private int _rating;
 
-    boolean _sort_by_name;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,15 +53,22 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         setSupportActionBar(toolbar);
         System.out.println("####################################################################### onCreate");
 
-        _region = "";
-        _length_min = 0;
-        _length_max = 0;
-        _quality = 0;
-        _rating = 0;
-        _grade_avg = 0;
-        _sort_by_name = false;
+        _preferences = getSharedPreferences("naturpark.prf", MODE_PRIVATE);
+
+        _region = _preferences.getString("FilteredRouteByRegion", "");
+        _length_min = _preferences.getFloat("FilteredRouteByLengthMin", 0);
+        _length_max = _preferences.getFloat("FilteredRouteByLengthMax", 0);
+        _quality = _preferences.getInt("FilteredRouteByQuality", 0);
+        _rating = _preferences.getInt("FilteredRouteByRating", 0);
+        _grade_avg = _preferences.getInt("FilteredRouteByGrade", 0);
+
         _list_route = new DbManager(this).queryRouteList();
         _list_obstacle = new DbManager(this).queryObstacleList();
+
+        SharedPreferences.Editor editor = _preferences.edit();
+        editor.putInt("SelectedRoute", 0);
+        editor.commit();
+
         init();
 
         // Initializing Drawer Layout and ActionBarToggle
@@ -98,20 +106,41 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
             public void onClick(View v) {
                 if (findViewById(R.id.tablelayout).getVisibility() == View.VISIBLE) {
                     findViewById(R.id.tablelayout).setVisibility(View.GONE);
-                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.shift_left));
+                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.icon_arrow_down));
                 }
                 else {
                     findViewById(R.id.tablelayout).setVisibility(View.VISIBLE);
-                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.shift_right));
+                    ((ImageButton) findViewById(R.id.button_show_filter)).setImageDrawable(getResources().getDrawable(R.drawable.icon_arrow_up));
                 }
             }
         });
+
+        ((TextView)findViewById(R.id.textview_region)).setText(_region);
+        ((TextView)findViewById(R.id.textview_length)).setText(_length_min + " - " + _length_max + " km");
+        ((TextView)findViewById(R.id.textview_quality)).setText(Route.QualityStrings[_quality]);
+        ((TextView)findViewById(R.id.textview_grade_avg)).setText(Route.GradeStrings[_grade_avg]);
+        ((TextView)findViewById(R.id.textview_rating)).setText(Route.RatingStrings[_rating]);
     }
 
     @Override
     public void onStart() {
         super.onStart();
         System.out.println("####################################################################### onStart");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        System.out.println("####################################################################### onPause");
+
+        SharedPreferences.Editor editor = _preferences.edit();
+        editor.putString("FilteredRouteByRegion", _region);
+        editor.putFloat("FilteredRouteByLengthMin", _length_min);
+        editor.putFloat("FilteredRouteByLengthMax", _length_max);
+        editor.putInt("FilteredRouteByQuality", _quality);
+        editor.putInt("FilteredRouteByRating", _rating);
+        editor.putInt("FilteredRouteByGrade", _grade_avg);
+        editor.commit();
     }
 
     @Override
@@ -122,11 +151,14 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
 
         System.out.print("Seleceted Route ID:" + view.getId());
 
+        SharedPreferences.Editor editor = _preferences.edit();
+        editor.putInt("SelectedRoute", view.getId());
+        editor.putInt("SelectedPoi", 0);
+        editor.commit();
+
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("Route", view.getId());
         startActivity(intent);
     }
-
 
     public void onClickHeaderRegion(View view) {
         PopupMenu menu = new PopupMenu(this, view);
@@ -196,11 +228,10 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         }
 
         PopupMenu menu = new PopupMenu(this, view);
-        menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "sehr gut");
-        menu.getMenu().add(Menu.NONE, 2, Menu.NONE, "gut");
-        menu.getMenu().add(Menu.NONE, 3, Menu.NONE, "mittel");
-        menu.getMenu().add(Menu.NONE, 4, Menu.NONE, "schlecht");
-        menu.getMenu().add(Menu.NONE, 5, Menu.NONE, "herausfordernd");
+        for (int i = 1; i < Route.QualityStrings.length; ++i) {
+            menu.getMenu().add(Menu.NONE, i, Menu.NONE, Route.QualityStrings[i]);
+        }
+
         menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -224,10 +255,9 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         }
 
         PopupMenu menu = new PopupMenu(this, view);
-        menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "1%");
-        menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "2%");
-        menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "3%");
-        menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "5%");
+        for (int i = 1; i < Route.GradeStrings.length; ++i) {
+            menu.getMenu().add(Menu.NONE, Route.GradeValues[i], Menu.NONE, Route.GradeStrings[i]);
+        }
         menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -241,7 +271,6 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void onClickHeaderRating(View view) {
-        PopupMenu menu = new PopupMenu(this, view);
 
         if (_rating != 0) {
             _rating = 0;
@@ -251,9 +280,11 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
             return;
         }
 
-        menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "Ungeeingt");
-        menu.getMenu().add(Menu.NONE, 2, Menu.NONE, "Bedingt");
-        menu.getMenu().add(Menu.NONE, 3, Menu.NONE, "Geeignet");
+        PopupMenu menu = new PopupMenu(this, view);
+        for (int i = 1; i < Route.RatingStrings.length; ++i) {
+            menu.getMenu().add(Menu.NONE, i, Menu.NONE, Route.RatingStrings[i]);
+        }
+
         menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -309,7 +340,7 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 params.addRule(RelativeLayout.ALIGN_BOTTOM);;
-                row.addView(_create_text_view(6, _get_rating_text(route.rating()), 14, _get_rating_color(route.rating())), params);
+                row.addView(_create_text_view(6, Route.RatingStrings[route.rating()], 14, _get_rating_color(route.rating())), params);
             }
             {
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
@@ -327,13 +358,13 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
                 params.addRule(RelativeLayout.BELOW, 2);
-                row.addView(_create_text_view(4, _get_quality_text(route.quality()), 14), params);
+                row.addView(_create_text_view(4, Route.QualityStrings[route.quality()], 14), params);
             }
             {
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 params.addRule(RelativeLayout.BELOW, 2);
-                row.addView(_create_text_view(5, _get_obstacles(route.id()) + "   " +route.slope_avg() + "%/" + route.slope_max() + "%", 14), params);
+                row.addView(_create_text_view(5, _cnt_obstacles_by_route(route.id()) + "   " +route.slope_avg() + "%/" + route.slope_max() + "%", 14), params);
             }
 
             list.addView(row);
@@ -385,7 +416,7 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         return list;
     }
 
-    private int _get_obstacles(int id) {
+    private int _cnt_obstacles_by_route(int id) {
         int num = 0;
 
         for (Obstacle obstacle : _list_obstacle) {
@@ -394,38 +425,6 @@ public class RouteListActivity extends AppCompatActivity implements View.OnClick
         }
 
         return num;
-    }
-
-    private String _get_quality_text(int quality) {
-
-        switch (quality) {
-            case 1:
-                return "sehr gut";
-            case 2:
-                return "gut";
-            case 3:
-                return "mittel";
-            case 4:
-                return "schlecht";
-            case 5:
-                return "herausfordernd";
-            default:
-                return "unbekannt";
-        }
-    }
-
-    private String _get_rating_text(int rating)
-    {
-        switch (rating) {
-            case 1:
-                return "Ungeeignet";
-            case 2:
-                return "Bedingt";
-            case 3:
-                return "Geeignet";
-            default:
-                return "Unbekannt";
-        }
     }
 
     private int _get_rating_color(int rating) {

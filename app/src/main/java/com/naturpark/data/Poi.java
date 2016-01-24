@@ -5,27 +5,28 @@ package com.naturpark.data;
  */
 import android.location.Location;
 
+import java.util.Random;
+
 public class Poi {
 
-    // generate a runtime dynamic id, used during for easy identification in app
-    static private int Id = 1;
+    static public String[] RatingStrings = { "Unbekannt", "Ungeeigent", "Bedingt", "Geeignet" };
 
     private int _id;
     private int _type;
     Location _location;
     private String _name;
     private String _address;
-    private String _classification;
+    private String _rating;
     private String _info;
 
-    public Poi(int type, Location location, String name, String address,String classification,String info)
+    public Poi(int id, int type, Location location, String name, String address,String rating,String info)
     {
-        _id = Id++;
+        _id = id;
         _type = type;
         _location = location;
         _name = name;
         _address = address;
-        _classification = classification;
+        _rating = rating;
         _info = info;
     }
 
@@ -34,16 +35,16 @@ public class Poi {
     public Location location() { return _location; }
     public String name() { return _name; }
     public String address() { return _address; }
-    public String classification() { return _classification; };
+    public String rating() { return _rating; };
     public String info() { return _info; };
 
-    public int classification_id() {
-        if (_classification == "Geeignet")
-            return 3;
-        if (_classification == "Bedingt")
-            return 2;
-        if (_classification == "Ungeeignet")
-            return 1;
+    public int rating_id() {
+
+        for (int i = 0; i < RatingStrings.length; ++i) {
+            if (RatingStrings[i].equals(_rating)) {
+                return i;
+            }
+        }
 
         return 0;
     }

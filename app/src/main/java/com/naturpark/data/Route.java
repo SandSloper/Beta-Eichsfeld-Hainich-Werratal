@@ -17,6 +17,11 @@ import java.util.ArrayList;
 
 public class Route implements Parcelable {
 
+    static public String[] QualityStrings = { "unbekannt", "sehr gut", "gut", "mittel", "schlecht", "herausfordernd"};
+    static public int[] GradeValues = { 100, 1, 2, 3, 5 };
+    static public String[] GradeStrings = { "alle", "1%", "2%", "3%", "5%" };
+    static public String[] RatingStrings = { "Unbekannt", "Ungeeigent", "Bedingt", "Geeignet" };
+
     public Route(int id, String region, String name, float length, int grade_avg, int grade_max, int quality, int rating)
     {
         _id = id;
