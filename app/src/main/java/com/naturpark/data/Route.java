@@ -43,8 +43,8 @@ public class Route implements Parcelable {
         out.writeString(_name);
     }
 
-    public static final Parcelable.Creator<Route> CREATOR
-            = new Parcelable.Creator<Route>() {
+    public static final Creator<Route> CREATOR
+            = new Creator<Route>() {
         public Route createFromParcel(Parcel in) {
             return new Route(in);
         }
