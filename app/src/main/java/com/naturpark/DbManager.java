@@ -174,7 +174,7 @@ public class DbManager extends SQLiteOpenHelper {
         }
         catch (SQLiteException e)
         {
-            System.out.println("SQLiteException:" + e.getMessage());
+            System.out.println("SQLiteException:" + ehttps://www.youtube.com/watch?v=_cfgCWf0Jes&list=PL6066B33267C38E30.getMessage());
         }
 
         return list_route;
@@ -274,14 +274,6 @@ public class DbManager extends SQLiteOpenHelper {
         return list_poi;
     }
 
-    public void update(PoiType poiType)
-    {
-        System.out.println("...............................................update:" + poiType.id());
-        ContentValues values = new ContentValues();
-        values.put("visible", poiType.is_visible());
-        values.put("icon_name", poiType.iconName());
-         _database.update("Poi_type", values, "id=" + poiType.id(), null);
-    }
 
     public Cursor fetchPoiByName(String inputText) throws SQLException {
 

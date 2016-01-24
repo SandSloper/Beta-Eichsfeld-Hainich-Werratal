@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
-     private List<Route> _list_route;
+    private List<Route> _list_route;
     private List<PoiType> _list_poi_type;
     private List<Poi> _list_poi;
     private List<Obstacle> _list_obstacle;
