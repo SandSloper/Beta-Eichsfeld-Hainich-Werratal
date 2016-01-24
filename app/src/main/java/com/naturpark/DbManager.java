@@ -40,7 +40,7 @@ public class DbManager extends SQLiteOpenHelper {
 
     private static final String TABLE_NAME = "poi";
 
-    private SQLiteDatabase _database;
+    private SQLiteDatabase _database = getReadableDatabase();
 
     public DbManager(Context context)
     {
@@ -56,10 +56,7 @@ public class DbManager extends SQLiteOpenHelper {
         if(dbExist)
         {
             Log.v("DB Exists", "db exists");
-            // By calling this method here onUpgrade will be called on a
-            // writeable database, but only if the version number has been
-            // bumped
-            //onUpgrade(myDataBase, DATABASE_VERSION_old, DATABASE_VERSION);
+
         }
         boolean dbExist1 = checkDataBase();
         if(!dbExist1)
@@ -93,7 +90,7 @@ public class DbManager extends SQLiteOpenHelper {
         return checkDB;
     }
 
-    //Copies your database from your local assets-folder to the just created empty database in the system folder
+    //Copies atabase from your local assets-folder to the just created empty database in the system folder
 
     private void copyDataBase() throws IOException
     {
@@ -278,7 +275,7 @@ public class DbManager extends SQLiteOpenHelper {
     {
         System.out.println("...............................................update:" + poiType.id());
         ContentValues values = new ContentValues();
-        values.put("visible", poiType.is_visible());
+        //values.put("visible", poiType.is_visible());
         values.put("icon_name", poiType.iconName());
          _database.update("Poi_type", values, "id=" + poiType.id(), null);
     }
