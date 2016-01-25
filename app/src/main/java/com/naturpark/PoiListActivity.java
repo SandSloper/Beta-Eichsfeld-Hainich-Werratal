@@ -194,6 +194,9 @@ public class PoiListActivity extends AppCompatActivity
         if (_filtered_rating != 0) {
             _filtered_rating = 0;
             ((TextView) findViewById(R.id.textview_rating)).setText("alle");
+            SharedPreferences.Editor editor = _preferences.edit();
+            editor.putInt("FilteredPoiRating", _filtered_rating);
+            editor.commit();
             init();
 
             return;

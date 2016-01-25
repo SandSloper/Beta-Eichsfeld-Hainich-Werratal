@@ -7,7 +7,7 @@ INSERT INTO "route" VALUES(3,'Dresden','Elbtalhänge',23.45,8,8,1,2);
 INSERT INTO "route" VALUES(4,'Dresden','Großer Garten',2.3,0,0,2,3);
 INSERT INTO "route" VALUES(5,'Dresden','Altstadt',2.3,0,3,3,2);
 INSERT INTO "route" VALUES(6,'Dresden','Neustadt',3.5,1,4,3,3);
-INSERT INTO "route" VALUES(7, 'Hainich', '', 2.8, 1,2,3,4);
+INSERT INTO "route" VALUES(7, 'Hainich', '', 2.8, 1,2,3,2);
 INSERT INTO "route" VALUES(8, 'Hainich', '', 7.3, 3,6,2,1);
 INSERT INTO "route" VALUES(9, 'Hainich', 'Zum Baumlehrpfad', 1.5, 1,5,1,1);
 INSERT INTO "route" VALUES(10, 'Hainich', 'Alte Buchen', 3.0, 3,3,2,1);

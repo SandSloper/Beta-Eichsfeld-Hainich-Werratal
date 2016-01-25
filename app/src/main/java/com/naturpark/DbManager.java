@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
-import android.util.Log;
 
 import com.naturpark.data.Obstacle;
 import com.naturpark.data.Poi;
@@ -24,14 +23,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class DbManager extends SQLiteOpenHelper {
-
-    private final Context myContext;
-    private static final String DATABASE_NAME = "naturpark.db";
-    public static String DATABASE_PATH = "";
-    public static final int DATABASE_VERSION = 1;
+    private static String DB_PATH;
+    private static String DB_PATH_PREFIX = "/data/data/";
+    private static String DB_PATH_SUFFIX = "/databases/";
 
     public static final String KEY_ROWID = "_id";
     public static final String KEY_NAME = "name";
@@ -39,113 +37,35 @@ public class DbManager extends SQLiteOpenHelper {
     public static final String KEY_INFO = "info";
 
     private static final String TABLE_NAME = "poi";
+ 
+    private SQLiteDatabase _database;
 
-    private SQLiteDatabase _database = getReadableDatabase();
-
-    public DbManager(Context context)
-    {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.myContext = context;
-        DATABASE_PATH = myContext.getDatabasePath(DATABASE_NAME).toString();
+    public DbManager(Context context, boolean enforce_copy) {
+        super(context, context.getString(R.string.database), null, 1);
+        _init(context, enforce_copy);
     }
 
-    //Create a empty database on the system
-    public void create() throws IOException
-    {
-        boolean dbExist = checkDataBase();
-        if(dbExist)
-        {
-            Log.v("DB Exists", "db exists");
-
-        }
-        boolean dbExist1 = checkDataBase();
-        if(!dbExist1)
-        {
-            this.getReadableDatabase();
-            try
-            {
-                this.close();
-                copyDataBase();
-            }
-            catch (IOException e)
-            {
-                throw new Error("Error copying database");
-            }
-        }
+    public DbManager(Context context) {
+        super(context, context.getString(R.string.database), null, 1);
+        _init(context, false);
     }
 
-    //Check database already exist or not
-    private boolean checkDataBase()
+    public void finalize()
     {
-        boolean checkDB = false;
-        try
-        {
-            String myPath = DATABASE_PATH;
-            File dbfile = new File(myPath);
-            checkDB = dbfile.exists();
-        }
-        catch(SQLiteException e)
-        {
-        }
-        return checkDB;
+        close();
     }
 
-    //Copies atabase from your local assets-folder to the just created empty database in the system folder
 
-    private void copyDataBase() throws IOException
-    {
-        String outFileName = DATABASE_PATH;
-        OutputStream myOutput = new FileOutputStream(outFileName);
-        InputStream myInput = myContext.getAssets().open(DATABASE_NAME);
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = myInput.read(buffer)) > 0)
-        {
-            myOutput.write(buffer, 0, length);
-        }
-        myInput.close();
-        myOutput.flush();
-        myOutput.close();
+    public void open() throws SQLException {
+        _database = SQLiteDatabase.openDatabase(DB_PATH + getDatabaseName(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
     }
 
-    //delete database
-    public void db_delete()
-    {
-        File file = new File(DATABASE_PATH);
-        if(file.exists())
-        {
-            file.delete();
-            System.out.println("delete database file.");
-        }
-    }
-
-    //Open database
-    public void open() throws SQLException
-    {
-        String myPath = DATABASE_PATH;
-        _database = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READWRITE);
-    }
-
-    public synchronized void closeDataBase()throws SQLException
-    {
-        if(_database != null)
+    public synchronized void close() {
+        if (_database != null) {
             _database.close();
+        }
         super.close();
     }
-
-    public void onCreate(SQLiteDatabase db)
-    {
-    }
-
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
-    {
-        if (newVersion > oldVersion)
-        {
-            Log.v("Database Upgrade", "Database version higher than old.");
-            db_delete();
-        }
-    }
-    //add your public methods for insert, get, delete and update data in database.
 
     public List<Route> queryRouteList() {
 
@@ -271,6 +191,59 @@ public class DbManager extends SQLiteOpenHelper {
         return list_poi;
     }
 
+    public void onCreate(SQLiteDatabase db) {
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase database, int version_old, int current_version) {
+        String query;
+        query = "DROP TABLE IF EXISTS obstacle";
+        database.execSQL(query);
+        onCreate(database);
+    }
+    private void copy(Context context, boolean enforce_copy) throws IOException {
+        InputStream assetsDB = context.getAssets().open(getDatabaseName());
+        File file = new File(DB_PATH);
+
+        if (file.exists() == false) {
+            file.mkdir();
+        }
+
+        File file_out = new File(DB_PATH + getDatabaseName());
+        if (file_out.exists() && enforce_copy) {
+            System.out.println("delete database file");
+            file_out.delete();
+        }
+
+        OutputStream out = new FileOutputStream(DB_PATH + getDatabaseName());
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = assetsDB.read(buffer)) > 0) {
+            out.write(buffer, 0, length);
+        }
+        out.flush();
+        out.close();
+    }
+
+    private void _init(Context context, boolean enforce_copy) {
+
+        DB_PATH = DB_PATH_PREFIX + context.getPackageName() + DB_PATH_SUFFIX + "/";
+        try {
+            copy(context, enforce_copy);
+        }
+        catch (IOException e)
+        {
+            System.out.println("IoException:" + e.getMessage());
+        }
+
+        try {
+            open();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("SQLException:" + e.getMessage());
+        }
+    }
 
     public Cursor fetchPoiByName(String inputText) throws SQLException {
 
