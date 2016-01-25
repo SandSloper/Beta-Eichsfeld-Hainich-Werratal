@@ -40,11 +40,6 @@ public class DbManager extends SQLiteOpenHelper {
  
     private SQLiteDatabase _database;
 
-    public DbManager(Context context, boolean enforce_copy) {
-        super(context, context.getString(R.string.database), null, 1);
-        _init(context, enforce_copy);
-    }
-
     public DbManager(Context context) {
         super(context, context.getString(R.string.database), null, 1);
         _init(context, false);
@@ -201,7 +196,7 @@ public class DbManager extends SQLiteOpenHelper {
         database.execSQL(query);
         onCreate(database);
     }
-    private void copy(Context context, boolean enforce_copy) throws IOException {
+    public void copy(Context context, boolean enforce_copy) throws IOException {
         InputStream assetsDB = context.getAssets().open(getDatabaseName());
         File file = new File(DB_PATH);
 
@@ -210,10 +205,13 @@ public class DbManager extends SQLiteOpenHelper {
         }
 
         File file_out = new File(DB_PATH + getDatabaseName());
-        if (file_out.exists() && enforce_copy) {
-            System.out.println("delete database file");
-            file_out.delete();
-        }
+        if (file_out.exists())
+            if (enforce_copy) {
+                System.out.println("delete database file");
+                file_out.delete();
+            }else {
+                return;
+            }
 
         OutputStream out = new FileOutputStream(DB_PATH + getDatabaseName());
         byte[] buffer = new byte[1024];
@@ -230,12 +228,9 @@ public class DbManager extends SQLiteOpenHelper {
         DB_PATH = DB_PATH_PREFIX + context.getPackageName() + DB_PATH_SUFFIX + "/";
         try {
             copy(context, enforce_copy);
+        }catch (IOException e) {
+            e.printStackTrace();
         }
-        catch (IOException e)
-        {
-            System.out.println("IoException:" + e.getMessage());
-        }
-
         try {
             open();
         }

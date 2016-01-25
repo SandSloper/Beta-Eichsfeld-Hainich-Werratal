@@ -1,6 +1,8 @@
 package com.naturpark;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.graphics.Color;
@@ -14,6 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -172,6 +176,19 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+
+        //add Sync Button and Sync method
+        ImageButton add = (ImageButton) findViewById(R.id.sync);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    dbHelper.copy(getApplicationContext(), true);
+                }catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     //Handling Map events
@@ -281,8 +298,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
 
 
-          DbManager dbManager = new DbManager(this, _creating);
-        _creating = false;
+          DbManager dbManager = new DbManager(this);
 
         _list_route = dbManager.queryRouteList();
         _list_poi_type = dbManager.queryPoiTypeList();
