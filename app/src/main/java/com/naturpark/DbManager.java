@@ -171,7 +171,7 @@ public class DbManager extends SQLiteOpenHelper {
         }
         catch (SQLiteException e)
         {
-            System.out.println("SQLiteException:" + ehttps://www.youtube.com/watch?v=_cfgCWf0Jes&list=PL6066B33267C38E30.getMessage());
+            System.out.println("SQLiteException:" + e.getMessage());
         }
 
         return list_route;
