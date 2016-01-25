@@ -172,9 +172,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         //Setting the actionbarToggle to drawer layout
         drawerLayout.setDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-
-        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
-        map.getOverlays().add(0, mapEventsOverlay);
     }
 
     //Handling Map events
@@ -300,6 +297,9 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         _addPoiToMap(map);
         _addObstaclesToMap(map);
         _addRoutesToMap(map);
+
+        MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this, this);
+        map.getOverlays().add(0, mapEventsOverlay);
     }
 
     @Override
