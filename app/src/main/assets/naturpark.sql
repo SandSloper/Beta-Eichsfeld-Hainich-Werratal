@@ -15,12 +15,12 @@ INSERT INTO "route" VALUES(11, 'Müritz', 'Entlang der Müritz', 2.0, 2,2,2,2);
 INSERT INTO "route" VALUES(12, 'Müritz', 'Um die Müritz', 1.0, 1,1,1,1);
 INSERT INTO "route" VALUES(13, 'Sassnitz', 'Kreidefelsen', 4.2, 2,2, 1, 1);
 CREATE TABLE poi_type(id int, name text, icon_name text);
-INSERT INTO "poi_type" VALUES(1,'Hotel','h');
-INSERT INTO "poi_type" VALUES(2,'Aussichtspunkt','a');
-INSERT INTO "poi_type" VALUES(3,'Laden','s');
-INSERT INTO "poi_type" VALUES(4,'Haltestelle','oenv');
-INSERT INTO "poi_type" VALUES(5,'Parkplatz','p');
-INSERT INTO "poi_type" VALUES(6,'Kirche', 'k');
+INSERT INTO "poi_type" VALUES(1,'Hotel','marker_poi_hotel');
+INSERT INTO "poi_type" VALUES(2,'Aussichtspunkt','marker_poi_viewpoint');
+INSERT INTO "poi_type" VALUES(3,'Laden','marker_poi_repairshop');
+INSERT INTO "poi_type" VALUES(4,'Haltestelle','marker_poi_stop');
+INSERT INTO "poi_type" VALUES(5,'Parkplatz','marker_poi_parking');
+INSERT INTO "poi_type" VALUES(6,'Kirche', 'marker_poi_church');
 CREATE TABLE obstacle_type (id int, name text, icon_name text);
 INSERT INTO "obstacle_type" VALUES(1,'Schranke','marker_schranke.png');
 INSERT INTO "obstacle_type" VALUES(2,'Treppe','marker_treppe.png');
@@ -55,10 +55,10 @@ CREATE TABLE [poi] (
   [classification] TEXT, 
   [info] TEXT);
 INSERT INTO "poi" VALUES(1,2,51.03785,13.76288,'Palais im Großen Garten','Addresse1','Geeignet','Das Palais im Großen Garten gilt als Inkunabel des sächsischen Barocks. In der Zeit August des Starken Schauplatz fulminanter Festivitäten von europäischer Ausstrahlung, brannte es beim Bombenangriff auf Dresden im Februar 1945 gänzlich aus. Noch heute sind die Schäden im kriegsversehrten Festsaal sichtbar.');
-INSERT INTO "poi" VALUES(2,2,51.05173,13.74117,'Frauenkirche','Addresse2','Geeignet','Die Dresdner Frauenkirche wurde von 1726 bis 1743 nach einem Entwurf von George Bähr erbaut. Im Luftkrieg des Zweiten Weltkriegs wurde sie während der Luftangriffe auf Dresden in der Nacht vom 13. zum 14. Februar 1945 durch den in Dresden wütenden Feuersturm schwer beschädigt und stürzte am Morgen des 15. Februar ausgebrannt in sich zusammen. In der DDR blieb ihre Ruine erhalten und diente als Mahnmal gegen Krieg und Zerstörung. Nach der Wende begann 1994 der 2005 abgeschlossene Wiederaufbau, den Fördervereine und Spender aus aller Welt finanzieren halfen.');
-INSERT INTO "poi" VALUES(3,2,51.05361,13.73786,'Katholische Hofkirche','Chiaveriegasse, Innere Altstadt, Dresden','Geeignet','Die Katholische Hofkirche in Dresden, geweiht der heiligsten Dreifaltigkeit (Sanctissimae Trinitatis), ist Kathedrale des Bistums Dresden-Meißen sowie eine Stadtpfarrkirche Dresdens. Sie wurde unter Kurfürst Friedrich August II. von Sachsen durch Gaetano Chiaveri von 1739 bis 1755 im Stil des Barocks errichtet. Im Jahr 1964 bereits zur Konkathedrale erhoben, wurde sie 1980 durch die Verlegung des Bischofssitzes von Bautzen nach Dresden zur Kathedrale des Bistums Dresden-Meißen.');
+INSERT INTO "poi" VALUES(2,6,51.05173,13.74117,'Frauenkirche','Addresse2','Geeignet','Die Dresdner Frauenkirche wurde von 1726 bis 1743 nach einem Entwurf von George Bähr erbaut. Im Luftkrieg des Zweiten Weltkriegs wurde sie während der Luftangriffe auf Dresden in der Nacht vom 13. zum 14. Februar 1945 durch den in Dresden wütenden Feuersturm schwer beschädigt und stürzte am Morgen des 15. Februar ausgebrannt in sich zusammen. In der DDR blieb ihre Ruine erhalten und diente als Mahnmal gegen Krieg und Zerstörung. Nach der Wende begann 1994 der 2005 abgeschlossene Wiederaufbau, den Fördervereine und Spender aus aller Welt finanzieren halfen.');
+INSERT INTO "poi" VALUES(3,6,51.05361,13.73786,'Katholische Hofkirche','Chiaveriegasse, Innere Altstadt, Dresden','Geeignet','Die Katholische Hofkirche in Dresden, geweiht der heiligsten Dreifaltigkeit (Sanctissimae Trinitatis), ist Kathedrale des Bistums Dresden-Meißen sowie eine Stadtpfarrkirche Dresdens. Sie wurde unter Kurfürst Friedrich August II. von Sachsen durch Gaetano Chiaveri von 1739 bis 1755 im Stil des Barocks errichtet. Im Jahr 1964 bereits zur Konkathedrale erhoben, wurde sie 1980 durch die Verlegung des Bischofssitzes von Bautzen nach Dresden zur Kathedrale des Bistums Dresden-Meißen.');
 INSERT INTO "poi" VALUES(4,3,51.20996,10.46192,'Laufladen Zwei G    ',NULL,'Geeignet','Laufladen zwei G – Ihr Fachgeschäft für Sport- und Freizeitartikel');
-INSERT INTO "poi" VALUES(5,2,51.210074,10.454762,'Marien Kirche',NULL,'Geeignet','Die Marienkirche ist eine gotische Kirche in der thüringischen Stadt Mühlhausen. Sie gilt als Meisterwerk der Gotik und ist, nach dem Erfurter Dom, die zweitgrößte Kirche Thüringens. Errichtet wurde sie hauptsächlich im 14. Jahrhundert. Ihr 86,7 Meter hoher Mittelturm ist der höchste des Bundeslandes und prägt maßgeblich die Stadtsilhouette. Die Marienkirche war darüber hinaus ein Ereignisort des Bauernkriegs um 1525, da der Revolutionsführer Thomas Müntzer hier als Pfarrer wirkte.');
+INSERT INTO "poi" VALUES(5,6,51.210074,10.454762,'Marienkirche',NULL,'Geeignet','Die Marienkirche ist eine gotische Kirche in der thüringischen Stadt Mühlhausen. Sie gilt als Meisterwerk der Gotik und ist, nach dem Erfurter Dom, die zweitgrößte Kirche Thüringens. Errichtet wurde sie hauptsächlich im 14. Jahrhundert. Ihr 86,7 Meter hoher Mittelturm ist der höchste des Bundeslandes und prägt maßgeblich die Stadtsilhouette. Die Marienkirche war darüber hinaus ein Ereignisort des Bauernkriegs um 1525, da der Revolutionsführer Thomas Müntzer hier als Pfarrer wirkte.');
 INSERT INTO "poi" VALUES(6,4,51.21155,10.460057,'Bus Bahnhof','Bahnhofstraße 1, 99974 Mühlhausen/Thüringen ','Bedingt','Öffnungszeiten ZOB:
 Montag bis Freitag
 06:30 Uhr bis 09:30 Uhr

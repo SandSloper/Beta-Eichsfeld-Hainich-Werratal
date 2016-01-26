@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     @Override
     public boolean longPressHelper(GeoPoint p) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Neues Hindernis");
         builder.setIcon(R.drawable.marker_default);
 
@@ -227,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
                 if (obstacle_type_spinner.getSelectedItem().toString() == "Schranke"){
                     type = 1;
                     name = "Schranke";
-                    System.out.println("--------------------------------------------------------"+type+name);
                 }
                 if (obstacle_type_spinner.getSelectedItem().toString() == "Treppe"){
                     type = 2;
@@ -244,10 +243,12 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
                 if (obstacle_type_spinner.getSelectedItem().toString() == "Rinne"){
                     type = 5;
                     name = "Rinne";
+                    builder.setIcon(R.drawable.marker_rinne);
                 }
                 if (obstacle_type_spinner.getSelectedItem().toString() == "Poller"){
                     type = 6;
                     name = "Poller";
+                    builder.setIcon(R.drawable.marker_poller);
                 }
                 if (obstacle_type_spinner.getSelectedItem().toString() == "Abhang"){
                     type = 7;
@@ -374,10 +375,13 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
                     new GeoPoint(poi.location().getLatitude(), poi.location().getLongitude()));
             PoiType poiType = _getPoiType(poi.type());
             if (poiType != null) {
-                item.setMarker(getResources().getDrawable(getResources().getIdentifier(poiType.iconName(), "drawable", getPackageName())));
+                String res_name = poiType.iconName()+"_cat"+poi.rating_id();
+                if (getResources().getIdentifier(res_name, "drawable", getPackageName()) != 0) {
+                    item.setMarker(getResources().getDrawable(getResources().getIdentifier(res_name, "drawable", getPackageName())));
 
-                if (_filtered_poi_types.contains(new Integer(poiType.id())))
-                    overlayItemArray.add(item);
+                    if (_filtered_poi_types.contains(new Integer(poiType.id())))
+                        overlayItemArray.add(item);
+                }
             }
         }
 
