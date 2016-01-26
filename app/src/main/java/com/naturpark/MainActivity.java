@@ -1,9 +1,11 @@
 package com.naturpark;
 
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +24,7 @@ import com.naturpark.data.Poi;
 import com.naturpark.data.PoiType;
 import com.naturpark.data.Route;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
@@ -94,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
     private Toolbar toolbar;
     protected MapView map;
+    private ItemizedIconOverlay<OverlayItem> _obstacleOverlay;
     private NavigationView navigationView;
     private DrawerLayout drawerLayout;
 
@@ -111,8 +115,6 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
     private int _classification = 0;
 
     private DbManager dbHelper;
-    private int type;
-    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,13 +189,10 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Neues Hindernis");
-        builder.setIcon(R.drawable.marker_stufe);
+        builder.setIcon(R.drawable.marker_default);
 
         final double latitude = p.getLatitude();
         final double longitude = p.getLongitude();
-
-        final float lat_f = (float) latitude;
-        final float lon_f = (float) longitude;
 
         String obstacle_types[] = new String[]{"Bitte wählen","Schranke", "Treppe", "Engstelle", "Stufe", "Rinne", "Poller", "Abhang"};
         final Spinner obstacle_type_spinner = new Spinner(this);
@@ -206,6 +205,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                int type = 0;
+                String name = "";
                 if (obstacle_type_spinner.getSelectedItem().toString() == "Schranke"){
                     type = 1;
                     name = "Schranke";
@@ -235,10 +236,16 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
                     type = 7;
                     name = "Abhang";
                 }
-                dbHelper.insertObstacle(type, lat_f, lon_f, name);
+                dbHelper.insertObstacle(type, (float)latitude, (float)longitude, name);
                 Log.d("Insert: ", "Inserting ..");
                 dbHelper.close();
-
+                Location location = new Location("");
+                location.setLatitude(latitude);
+                location.setLongitude(longitude);
+                _list_obstacle.add(new Obstacle(_get_new_obstacle_id(), type, 0, location, name));
+                map.getOverlays().remove(_obstacleOverlay);
+                _addObstaclesToMap(map);
+                map.getController().setCenter(new GeoPoint(latitude, longitude));
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -424,7 +431,8 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
             }
         };
 
-        map.getOverlays().add(new ItemizedIconOverlay<OverlayItem>(overlayItemArray, gestureListener, new CustomResourceProxy(this)));
+        ItemizedIconOverlay<OverlayItem> obstacleOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, gestureListener, new CustomResourceProxy(this));
+        map.getOverlays().add(obstacleOverlay);
     }
 
     private void _addRoutesToMap(MapView map) {
@@ -470,6 +478,17 @@ public class MainActivity extends AppCompatActivity implements MapListener, View
         }
 
         return null;
+    }
+
+    private int _get_new_obstacle_id() {
+        int new_id = 0;
+
+        for (Obstacle o: _list_obstacle) {
+            if (o.id() >= new_id)
+                new_id = o.id()+1;
+        }
+
+        return new_id;
     }
 
 
