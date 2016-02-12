@@ -21,7 +21,7 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="Naturpark Hainich" >
+            android:label="Naturpark Eichsfeld-Hainich-Werratal" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
