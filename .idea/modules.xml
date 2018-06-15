@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Naturpark_Hainich.iml" filepath="$PROJECT_DIR$/Naturpark_Hainich.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NP-Eichsfeld-Hainich-Werratal.iml" filepath="$PROJECT_DIR$/NP-Eichsfeld-Hainich-Werratal.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
